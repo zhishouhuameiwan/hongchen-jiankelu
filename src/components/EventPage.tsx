@@ -1,6 +1,6 @@
 import { events } from '../data/events'
-import { checkRequirements } from '../engine/conditionEngine'
 import { getChoiceOutcomeTags } from '../engine/choicePreviewEngine'
+import { canChooseChoice } from '../engine/eventEngine'
 import { describeChoiceEffects } from '../engine/rewardSummaryEngine'
 import { useGameStore } from '../store/gameStore'
 import type { Choice } from '../types/game'
@@ -25,7 +25,8 @@ export function EventPage() {
     )
   }
 
-  const can = (choice: Choice) => state.stamina >= choice.staminaCost && checkRequirements(state, choice.requirements ?? [])
+  const can = (choice: Choice) => canChooseChoice(state, choice)
+  const hasAvailableChoice = event.choices.some(can)
 
   return (
     <main>
@@ -33,6 +34,12 @@ export function EventPage() {
       <section className="panel">
         <h2>{event.title}</h2>
         <p>{event.text}</p>
+        {!hasAvailableChoice ? (
+          <div className="event-blocked">
+            <p>你已无力继续处理此事，先退回地图休整吧。</p>
+            <button onClick={() => go('map')}>返回地图</button>
+          </div>
+        ) : null}
         {event.choices.map((choice) => (
           <button key={choice.id} disabled={!can(choice)} onClick={() => choose(choice)}>
             {choice.text}{' '}

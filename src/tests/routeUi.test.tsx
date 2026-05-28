@@ -27,6 +27,18 @@ describe('route UI presentation', () => {
     expect(screen.getByText(/第 25 日后血河经终局会逼近/)).toBeInTheDocument()
   })
 
+  it('shows only three location cards on the map at a time', () => {
+    useGameStore.setState({ state: createInitialGameState('测试侠客', 'wandering_swordsman'), setupScreen: 'menu' })
+
+    render(<App />)
+
+    expect(screen.getAllByRole('button', { name: /路程体力/ })).toHaveLength(3)
+    expect(screen.getByRole('button', { name: /青石镇/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /听雨茶楼/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /黑松林/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /百草医馆/ })).not.toBeInTheDocument()
+  })
+
   it('shows current goals on the map based on story progress', () => {
     const early = createInitialGameState('测试侠客', 'wandering_swordsman')
     useGameStore.setState({ state: { ...early, screen: 'map' }, setupScreen: 'menu' })
@@ -55,8 +67,8 @@ describe('route UI presentation', () => {
     render(<App />)
 
     expect(screen.getByRole('button', { name: /青石镇/ })).toHaveTextContent('路程体力 -1')
+    expect(screen.getByRole('button', { name: /听雨茶楼/ })).toHaveTextContent('路程体力 -1')
     expect(screen.getByRole('button', { name: /黑松林/ })).toHaveTextContent('路程体力 -2')
-    expect(screen.getByRole('button', { name: /青霜剑派别院/ })).toHaveTextContent('路程体力 -2')
   })
 
   it('shows remaining stamina previews for event choices', () => {
@@ -96,6 +108,74 @@ describe('route UI presentation', () => {
     render(<App />)
 
     expect(screen.getByRole('button', { name: /帮忙搬运货物/ })).toHaveTextContent('预览：银两 +6')
+  })
+
+  it('lets the player return to the map when an event has no affordable choices', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        stamina: 0,
+        screen: 'event',
+        currentLocationId: 'forest',
+        currentEventId: 'forest_mad_warrior_01',
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+
+    expect(screen.getByRole('button', { name: /返回地图/ })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /返回地图/ }))
+
+    expect(useGameStore.getState().state!.screen).toBe('map')
+  })
+
+  it('automatically advances the phase instead of entering an event when travel drains all stamina', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({ state: { ...state, stamina: 2, screen: 'map' }, setupScreen: 'menu' })
+
+    render(<App />)
+
+    fireEvent.click(screen.getByRole('button', { name: /黑松林/ }))
+
+    expect(useGameStore.getState().state!.phase).toBe('night')
+    expect(useGameStore.getState().state!.screen).toBe('map')
+    expect(screen.getByText(/夜晚/)).toBeInTheDocument()
+    expect(screen.getByText(/夜色渐深，江湖暗流浮现。/)).toBeInTheDocument()
+  })
+
+  it('automatically resolves the enemy action after playing a combat card', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        screen: 'combat',
+        currentCombat: {
+          enemyId: 'bandit',
+          enemyHp: 28,
+          playerBlock: 0,
+          enemyBlock: 0,
+          turn: 1,
+          drawnCardIds: ['basic_slash', 'frost_seal'],
+          playerStatuses: [],
+          enemyStatuses: [],
+          log: ['山道劫匪 拦住了你的去路。'],
+          actionTaken: false,
+        },
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+    expect(screen.queryByRole('button', { name: /结束回合/ })).not.toBeInTheDocument()
+    expect(screen.getByText('出招后会自动结算敌方行动，进入下一回合。')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /劈风斩/ }))
+
+    expect(useGameStore.getState().state!.currentCombat?.turn).toBe(2)
+    expect(screen.getByText(/回合 2/)).toBeInTheDocument()
+    expect(screen.getByText(/山道劫匪 攻击，造成 6 点伤害。/)).toBeInTheDocument()
   })
 
   it('disables combat cards when inner power is insufficient and explains why', () => {
@@ -191,7 +271,7 @@ describe('route UI presentation', () => {
     expect(next.screen).toBe('map')
     expect(next.deck).toContain('basic_guard')
     expect(next.player.silver).toBe(state.player.silver + 8)
-    expect(next.log.at(-1)).toBe('战斗胜利，获得 8 两与 横剑格挡。')
+    expect(next.log.at(-2)).toBe('战斗胜利，获得 8 两与 横剑格挡。')
   })
 
   it('shows defeat consequences before accepting combat defeat', () => {

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { locationById } from '../data/world'
 import { createInitialGameState, useGameStore } from '../store/gameStore'
 import type { Choice } from '../types/game'
+import { startCombat } from '../engine/combatEngine'
+import { enemyById } from '../data/enemies'
 
 describe('gameStore menu flow', () => {
   it('opens new game setup without creating a playable save state', () => {
@@ -30,6 +32,22 @@ describe('gameStore exploration flow', () => {
     expect(state.stamina).toBe(6 - locationById.forest.staminaCost)
   })
 
+  it('automatically advances the phase when travel uses the last stamina point', () => {
+    const store = useGameStore.getState()
+    store.clearSavedGame()
+    useGameStore.setState({ state: { ...createInitialGameState('测试侠客', 'wandering_swordsman'), stamina: locationById.forest.staminaCost }, setupScreen: 'menu' })
+
+    store.exploreLocation('forest')
+
+    const state = useGameStore.getState().state!
+    expect(state.phase).toBe('night')
+    expect(state.screen).toBe('map')
+    expect(state.stamina).toBe(Math.ceil(state.maxStamina / 2))
+    expect(state.currentLocationId).toBeUndefined()
+    expect(state.currentEventId).toBeUndefined()
+    expect(state.log).toContain('夜色渐深，江湖暗流浮现。')
+  })
+
   it('keeps the hero on the map and records a hint when destination stamina is insufficient', () => {
     const store = useGameStore.getState()
     store.clearSavedGame()
@@ -46,7 +64,42 @@ describe('gameStore exploration flow', () => {
   })
 })
 
+describe('gameStore combat flow', () => {
+  it('automatically ends the player turn after playing one card', () => {
+    const store = useGameStore.getState()
+    store.clearSavedGame()
+    const combatState = startCombat(createInitialGameState('测试侠客', 'wandering_swordsman'), enemyById.bandit)
+    useGameStore.setState({ state: combatState, setupScreen: 'menu' })
+
+    store.playCard('basic_slash')
+
+    const state = useGameStore.getState().state!
+    expect(state.currentCombat?.turn).toBe(2)
+    expect(state.currentCombat?.actionTaken).toBe(false)
+    expect(state.currentCombat?.log).toContain('山道劫匪 攻击，造成 6 点伤害。')
+  })
+})
+
 describe('gameStore event feedback', () => {
+  it('automatically advances from day to night after choosing a non-combat event option and restores half stamina', () => {
+    const store = useGameStore.getState()
+    store.clearSavedGame()
+    useGameStore.setState({ state: { ...createInitialGameState('测试侠客', 'wandering_swordsman'), stamina: 1 }, setupScreen: 'menu' })
+    const choice: Choice = {
+      id: 'test_day_auto_advance',
+      text: '帮忙搬运货物',
+      staminaCost: 1,
+      effects: [{ type: 'gain_silver', value: 6 }],
+    }
+
+    store.chooseEventChoice(choice)
+
+    const state = useGameStore.getState().state!
+    expect(state.phase).toBe('night')
+    expect(state.stamina).toBe(3)
+    expect(state.log).toContain('夜色渐深，江湖暗流浮现。')
+  })
+
   it('records a readable reward summary after choosing an event option', () => {
     const store = useGameStore.getState()
     store.clearSavedGame()
@@ -66,6 +119,6 @@ describe('gameStore event feedback', () => {
     store.chooseEventChoice(choice)
 
     const state = useGameStore.getState().state!
-    expect(state.log.at(-1)).toBe('获得：银两 +12、卡牌「横剑格挡」、沈青霜好感 +1、魔心 +2')
+    expect(state.log.at(-2)).toBe('获得：银两 +12、卡牌「横剑格挡」、沈青霜好感 +1、魔心 +2')
   })
 })

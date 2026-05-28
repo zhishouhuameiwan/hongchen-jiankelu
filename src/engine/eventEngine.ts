@@ -1,17 +1,18 @@
-import type { Choice, GameEvent, GameState } from '../types/game'
+import type { Choice, GameEvent, GameState, LocationId } from '../types/game'
 import { checkRequirements } from './conditionEngine'
 import { applyEffects } from './effectEngine'
 import { spendStamina } from './dayPhaseEngine'
 import { describeChoiceEffects } from './rewardSummaryEngine'
+import { ordinaryEvents } from '../data/ordinaryEvents'
 
 export function getAvailableEvents(state: GameState, events: GameEvent[], locationId: string): GameEvent[] {
   return events.filter((event) => event.locationId === locationId && (event.phase === 'any' || event.phase === state.phase) && checkRequirements(state, event.requirements)).sort((a, b) => b.weight - a.weight)
 }
 
-export function pickEventForLocation(state: GameState, events: GameEvent[], locationId: string): GameEvent | undefined {
-  const available = getAvailableEvents(state, events, locationId)
-  if (available.length <= 1) return available[0]
-  return available.find((event) => !state.flags.includes(`seen_${event.id}`)) ?? available[0]
+export function pickEventForLocation(state: GameState, events: GameEvent[], locationId: LocationId): GameEvent {
+  const unseenSpecialEvents = getAvailableEvents(state, events, locationId).filter((event) => !state.flags.includes(`seen_${event.id}`))
+  if (unseenSpecialEvents.length === 0) return ordinaryEvents[locationId]
+  return unseenSpecialEvents[0]
 }
 
 export function canChooseChoice(state: GameState, choice: Choice): boolean {

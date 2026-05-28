@@ -66,21 +66,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return
     }
     const event = pickEventForLocation(state, events, locationId)
-    set({ state: persist({ ...state, stamina: state.stamina - location.staminaCost, currentLocationId: locationId, currentEventId: event?.id, screen: event ? 'event' : 'map' }) })
+    const afterTravel = { ...state, stamina: state.stamina - location.staminaCost, currentLocationId: locationId, currentEventId: event?.id, screen: event ? 'event' as const : 'map' as const }
+    set({ state: persist(afterTravel.stamina === 0 ? advancePhase(afterTravel) : afterTravel) })
   },
   setCurrentLocation: (locationId) => { const state = get().state; if (state) set({ state: persist({ ...state, currentLocationId: locationId }) }) },
   setCurrentEvent: (eventId) => { const state = get().state; if (state) set({ state: persist({ ...state, currentEventId: eventId, screen: 'event' }) }) },
-  chooseEventChoice: (choice) => { const state = get().state; if (state) set({ state: persist(applyChoice(state, choice)) }) },
+  chooseEventChoice: (choice) => {
+    const state = get().state
+    if (!state) return
+    const afterChoice = applyChoice(state, choice)
+    if (afterChoice.screen === 'map' && !afterChoice.currentCombat && !afterChoice.endingId) {
+      set({ state: persist(advancePhase(afterChoice)) })
+      return
+    }
+    set({ state: persist(afterChoice) })
+  },
   advancePhase: () => { const state = get().state; if (state) set({ state: persist(advancePhase(state)) }) },
-  playCard: (cardId) => { const state = get().state; if (!state?.currentCombat || state.currentCombat.result) return; set({ state: persist(playCombatCard(state, cardById[cardId])) }) },
+  playCard: (cardId) => {
+    const state = get().state
+    if (!state?.currentCombat || state.currentCombat.result) return
+    const enemy = enemyById[state.currentCombat.enemyId]
+    const afterCard = playCombatCard(state, cardById[cardId])
+    const shouldAutoEndTurn = !state.currentCombat.actionTaken && afterCard.currentCombat?.actionTaken && !afterCard.currentCombat.result
+    set({ state: persist(shouldAutoEndTurn ? endPlayerTurn(afterCard, enemy) : afterCard) })
+  },
   endTurn: () => { const state = get().state; if (!state?.currentCombat || state.currentCombat.result) return; set({ state: persist(endPlayerTurn(state, enemyById[state.currentCombat.enemyId])) }) },
   finishCombat: (rewardCardId) => {
     const state = get().state; if (!state?.currentCombat) return
     if (state.currentCombat.result === 'victory') {
       const enemy = enemyById[state.currentCombat.enemyId]
       const rewardCard = rewardCardId ?? enemy.rewardCardPool[0]
-      const next = { ...state, screen: 'map' as const, currentCombat: undefined, deck: state.deck.includes(rewardCard) ? state.deck : [...state.deck, rewardCard], player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, `战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`] }
-      set({ state: persist(next) })
+      const next = { ...state, screen: 'map' as const, currentCombat: undefined, currentEventId: undefined, currentLocationId: undefined, deck: state.deck.includes(rewardCard) ? state.deck : [...state.deck, rewardCard], player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, `战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`] }
+      set({ state: persist(advancePhase(next)) })
     } else {
       const ending = chooseEnding({ ...state, player: { ...state.player, stats: { ...state.player.stats, hp: 0 } } }, endings)
       set({ state: persist({ ...state, endingId: ending.id, screen: 'ending' }) })

@@ -9,7 +9,10 @@ export function spendStamina(state: GameState, amount: number): GameState {
 }
 
 export function advancePhase(state: GameState): GameState {
-  if (state.phase === 'day') return { ...state, phase: 'night', currentEventId: undefined, currentLocationId: undefined, log: [...state.log, '夜色渐深，江湖暗流浮现。'] }
+  if (state.phase === 'day') {
+    const recoveredStamina = Math.min(state.maxStamina, state.stamina + Math.ceil(state.maxStamina / 2))
+    return { ...state, screen: 'map', phase: 'night', stamina: recoveredStamina, currentEventId: undefined, currentLocationId: undefined, log: [...state.log, '夜色渐深，江湖暗流浮现。'] }
+  }
   const nextDay = state.day + 1
   if (nextDay > maxDays) {
     const ending = chooseEnding(state, endings)

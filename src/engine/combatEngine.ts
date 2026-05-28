@@ -6,7 +6,7 @@ export function drawCardIds(deck: string[], amount: number): string[] {
 }
 
 export function startCombat(state: GameState, enemy: EnemyDefinition): GameState {
-  return { ...state, screen: 'combat', currentCombat: { enemyId: enemy.id, enemyHp: enemy.maxHp, playerBlock: 0, enemyBlock: 0, turn: 1, drawnCardIds: drawCardIds(state.deck, 3), playerStatuses: [], enemyStatuses: [], log: [`${enemy.name} 拦住了你的去路。`] } }
+  return { ...state, screen: 'combat', currentCombat: { enemyId: enemy.id, enemyHp: enemy.maxHp, playerBlock: 0, enemyBlock: 0, turn: 1, drawnCardIds: drawCardIds(state.deck, 3), playerStatuses: [], enemyStatuses: [], log: [`${enemy.name} 拦住了你的去路。`], actionTaken: false } }
 }
 
 export function describeEnemyIntent(intent: EnemyIntent): string {
@@ -19,8 +19,10 @@ export function playCombatCard(state: GameState, card: CardDefinition): GameStat
   let next: GameState = structuredClone(state)
   const combat = next.currentCombat
   if (!combat) return next
+  if (combat.actionTaken) { combat.log.push('本回合已行动。'); return next }
   if (next.player.stats.innerPower < card.costInnerPower) { combat.log.push('内力不足。'); return next }
   next.player.stats.innerPower -= card.costInnerPower
+  combat.actionTaken = true
   for (const effect of card.effects) {
     if (effect.type === 'damage') { const damage = Math.max(0, effect.amount - combat.enemyBlock); combat.enemyHp = Math.max(0, combat.enemyHp - damage); combat.log.push(`${card.name} 造成 ${damage} 点伤害。`) }
     if (effect.type === 'block') { combat.playerBlock += effect.amount; combat.log.push(`${card.name} 获得 ${effect.amount} 点格挡。`) }
@@ -41,6 +43,7 @@ export function endPlayerTurn(state: GameState, enemy: EnemyDefinition): GameSta
   next.currentCombat.playerBlock = 0
   next.currentCombat.enemyBlock = 0
   next.currentCombat.drawnCardIds = drawCardIds(next.deck, 3)
+  next.currentCombat.actionTaken = false
   return next
 }
 
