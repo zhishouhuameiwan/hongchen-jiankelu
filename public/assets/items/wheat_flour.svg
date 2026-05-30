@@ -1,5 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="麦粉">
-  <rect width="100" height="100" rx="16" fill="#1f1a14"/>
-  <circle cx="50" cy="50" r="42" fill="#3a2b1f"/>
-  <rect x="28" y="25" width="44" height="55" rx="8" fill="#d7b06c"/><path d="M34 35 H66 M34 45 H66" stroke="#7b4e24" stroke-width="3"/><circle cx="50" cy="62" r="12" fill="#f1e4c5"/><path d="M42 62 h16" stroke="#caa96a" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 448" role="img" aria-labelledby="wheat-flour-title wheat-flour-desc" data-art-direction="ancient-wuxia-item" data-item-id="wheat_flour">
+  <title id="wheat-flour-title">麦粉</title>
+  <desc id="wheat-flour-desc">粗布粉袋盛着麦粉，袋口扎绳，旁边插着几支金色麦穗。</desc>
+  <defs>
+    <linearGradient id="wheat-flour-bg" x1="36" y1="24" x2="284" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1f1710"/>
+      <stop offset=".5" stop-color="#573821"/>
+      <stop offset="1" stop-color="#b98a49"/>
+    </linearGradient>
+    <linearGradient id="wheat-flour-sack" x1="99" y1="123" x2="225" y2="315" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#d4b47b"/>
+      <stop offset="1" stop-color="#8d6339"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="448" rx="30" fill="url(#wheat-flour-bg)"/>
+  <rect x="24" y="24" width="272" height="400" rx="24" fill="none" stroke="#efd08a" stroke-width="5" opacity=".78"/>
+  <circle cx="160" cy="210" r="118" fill="#ffdda1" opacity=".15"/>
+  <path d="M224 112 C212 157 210 201 220 271" fill="none" stroke="#d9ab55" stroke-width="5" stroke-linecap="round"/>
+  <path d="M235 127 L219 142 M239 151 L221 165 M237 176 L220 189 M208 129 L223 145 M204 153 L221 167 M204 178 L221 191" stroke="#f3d17a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M92 119 C109 139 211 139 227 119 L215 313 C187 337 132 337 104 313Z" fill="url(#wheat-flour-sack)" stroke="#4c2c1a" stroke-width="6"/>
+  <path d="M100 122 C128 103 190 103 219 122" fill="none" stroke="#f1d392" stroke-width="6" stroke-linecap="round"/>
+  <path d="M107 155 C132 168 189 168 213 155" fill="none" stroke="#5d371f" stroke-width="5" stroke-linecap="round"/>
+  <path d="M122 149 C129 165 124 177 112 186 M197 150 C191 166 196 178 209 187" fill="none" stroke="#5d371f" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="160" cy="244" rx="45" ry="28" fill="#f3e6c8" stroke="#80633c" stroke-width="4"/>
+  <path d="M128 244 C144 234 178 234 194 244 M139 257 C152 250 171 250 183 257" fill="none" stroke="#c9a86a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M118 203 C142 213 179 213 202 203 M114 286 C142 301 181 301 207 286" fill="none" stroke="#f3d99f" stroke-width="4" opacity=".58"/>
+  <path d="M87 331 C122 347 199 347 234 331" fill="none" stroke="#26130d" stroke-width="10" stroke-linecap="round" opacity=".25"/>
+  <text x="160" y="374" text-anchor="middle" font-size="34" font-family="serif" fill="#fff0c4">麦粉</text>
+  <text x="160" y="404" text-anchor="middle" font-size="18" font-family="serif" fill="#efd08a">粉袋与金色麦穗</text>
 </svg>

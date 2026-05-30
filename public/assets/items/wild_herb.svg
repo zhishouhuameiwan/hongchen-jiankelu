@@ -1,5 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="野山草">
-  <rect width="100" height="100" rx="16" fill="#1f1a14"/>
-  <circle cx="50" cy="50" r="42" fill="#3a2b1f"/>
-  <path d="M50 80 C48 58 48 38 50 20" stroke="#4d7d34" stroke-width="4"/><path d="M50 55 C28 45 28 30 48 42" fill="#6ea84f"/><path d="M52 48 C75 35 74 22 54 36" fill="#7fbd5b"/><path d="M50 70 C30 68 24 54 45 58" fill="#5f9f43"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 448" role="img" aria-labelledby="wild-herb-title wild-herb-desc" data-art-direction="ancient-wuxia-item" data-item-id="wild_herb">
+  <title id="wild-herb-title">野山草</title>
+  <desc id="wild-herb-desc">藤篮里盛着野山草和药草，根叶带着山林露水。</desc>
+  <defs>
+    <linearGradient id="wild-herb-bg" x1="34" y1="24" x2="286" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#142014"/>
+      <stop offset=".52" stop-color="#2e4f2a"/>
+      <stop offset="1" stop-color="#8a8a42"/>
+    </linearGradient>
+    <linearGradient id="wild-herb-basket" x1="80" y1="231" x2="240" y2="322" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c99a59"/>
+      <stop offset="1" stop-color="#6c3f21"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="448" rx="30" fill="url(#wild-herb-bg)"/>
+  <rect x="24" y="24" width="272" height="400" rx="24" fill="none" stroke="#efd08a" stroke-width="5" opacity=".78"/>
+  <circle cx="160" cy="210" r="118" fill="#e5ffb0" opacity=".12"/>
+  <path d="M160 255 C154 200 154 154 166 108" fill="none" stroke="#4c7b34" stroke-width="7" stroke-linecap="round"/>
+  <path d="M157 182 C116 157 112 129 151 145 C144 164 136 177 157 182Z" fill="#76a957" stroke="#2c5b31" stroke-width="4"/>
+  <path d="M166 171 C209 142 213 113 173 132 C180 151 188 163 166 171Z" fill="#8dc765" stroke="#2c5b31" stroke-width="4"/>
+  <path d="M156 226 C111 219 95 188 139 196 C135 213 136 224 156 226Z" fill="#5f9a45" stroke="#2c5b31" stroke-width="4"/>
+  <path d="M169 221 C213 210 224 181 184 190 C188 206 187 218 169 221Z" fill="#79b64f" stroke="#2c5b31" stroke-width="4"/>
+  <path d="M120 254 C103 216 113 180 136 151 M203 256 C221 213 211 178 188 150" fill="none" stroke="#5f8f3f" stroke-width="5" stroke-linecap="round"/>
+  <path d="M113 188 C90 174 91 150 119 161 C116 173 111 181 113 188Z" fill="#79b75c" stroke="#2c5b31" stroke-width="3"/>
+  <path d="M206 191 C235 174 232 149 203 162 C207 174 211 182 206 191Z" fill="#93cc67" stroke="#2c5b31" stroke-width="3"/>
+  <path d="M75 246 C88 221 232 221 245 246 C236 303 203 326 160 326 C117 326 84 303 75 246Z" fill="url(#wild-herb-basket)" stroke="#3f2416" stroke-width="5"/>
+  <ellipse cx="160" cy="246" rx="85" ry="25" fill="#d7a866" stroke="#3f2416" stroke-width="5"/>
+  <path d="M95 259 H225 M101 281 H219 M113 303 H207" stroke="#5c351d" stroke-width="4" opacity=".66"/>
+  <path d="M111 230 V315 M139 222 V325 M167 222 V326 M195 229 V316" stroke="#f1cc82" stroke-width="4" opacity=".5"/>
+  <path d="M87 330 C121 347 199 347 233 330" fill="none" stroke="#071a0c" stroke-width="10" stroke-linecap="round" opacity=".25"/>
+  <text x="160" y="374" text-anchor="middle" font-size="34" font-family="serif" fill="#f4f5c6">野山草</text>
+  <text x="160" y="404" text-anchor="middle" font-size="18" font-family="serif" fill="#dce8a0">藤篮野生药草</text>
 </svg>

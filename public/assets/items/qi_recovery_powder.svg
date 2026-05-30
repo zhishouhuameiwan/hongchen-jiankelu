@@ -1,8 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 448" role="img" aria-label="回气散">
-  <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#2a1811"/><stop offset="1" stop-color="#5fb3d9"/></linearGradient></defs>
-  <rect width="320" height="448" rx="28" fill="url(#g)"/>
-  <rect x="28" y="28" width="264" height="392" rx="22" fill="none" stroke="#f2d28b" stroke-width="6" opacity=".8"/>
-  <circle cx="160" cy="190" r="82" fill="#f8e4a6" opacity=".22"/>
-  <text x="160" y="216" text-anchor="middle" font-size="92" font-family="serif" fill="#f9e7b8">气</text>
-  <text x="160" y="346" text-anchor="middle" font-size="30" font-family="serif" fill="#fff2c8">回气散</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 448" role="img" aria-labelledby="qi-recovery-powder-title qi-recovery-powder-desc" data-art-direction="ancient-wuxia-item" data-item-id="qi_recovery_powder">
+  <title id="qi-recovery-powder-title">回气散</title>
+  <desc id="qi-recovery-powder-desc">青瓷药盏中的回气散，细白药粉旁放着药杵与纸包。</desc>
+  <defs>
+    <linearGradient id="qi-recovery-powder-bg" x1="38" y1="24" x2="282" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#111b1e"/>
+      <stop offset=".52" stop-color="#245060"/>
+      <stop offset="1" stop-color="#5fb3d9"/>
+    </linearGradient>
+    <linearGradient id="qi-recovery-powder-bowl" x1="88" y1="188" x2="233" y2="305" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#b9f1ef"/>
+      <stop offset="1" stop-color="#22606a"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="448" rx="30" fill="url(#qi-recovery-powder-bg)"/>
+  <rect x="24" y="24" width="272" height="400" rx="24" fill="none" stroke="#efd08a" stroke-width="5" opacity=".78"/>
+  <circle cx="160" cy="210" r="118" fill="#d4ffff" opacity=".14"/>
+  <path d="M92 139 L156 118 L214 164 L151 185Z" fill="#e8d6a4" stroke="#5b3a21" stroke-width="5"/>
+  <path d="M112 147 L151 174 M156 119 L151 174 M214 164 L151 174" stroke="#b28a4b" stroke-width="3" opacity=".7"/>
+  <path d="M205 129 C227 155 227 199 206 225" fill="none" stroke="#6b4227" stroke-width="14" stroke-linecap="round"/>
+  <path d="M82 214 C98 178 222 178 238 214 C230 276 200 314 160 314 C120 314 90 276 82 214Z" fill="url(#qi-recovery-powder-bowl)" stroke="#113438" stroke-width="6"/>
+  <ellipse cx="160" cy="214" rx="76" ry="28" fill="#bdf7f2" stroke="#113438" stroke-width="6"/>
+  <ellipse cx="160" cy="214" rx="49" ry="17" fill="#f4f3df"/>
+  <circle cx="141" cy="211" r="4" fill="#b9c2b7"/>
+  <circle cx="174" cy="219" r="3" fill="#b9c2b7"/>
+  <path d="M115 239 C140 253 180 253 205 239 M125 268 C145 281 176 281 195 268" fill="none" stroke="#d7ffff" stroke-width="4" stroke-linecap="round" opacity=".65"/>
+  <path d="M138 197 C121 177 140 157 126 136 M165 195 C150 166 178 148 161 120 M190 199 C211 175 189 151 209 130" fill="none" stroke="#e8ffff" stroke-width="7" stroke-linecap="round" opacity=".34"/>
+  <path d="M82 323 C118 342 202 342 238 323" fill="none" stroke="#071a19" stroke-width="10" stroke-linecap="round" opacity=".25"/>
+  <text x="160" y="374" text-anchor="middle" font-size="34" font-family="serif" fill="#eefbd3">回气散</text>
+  <text x="160" y="404" text-anchor="middle" font-size="18" font-family="serif" fill="#d7f5dc">青瓷盏中药粉</text>
 </svg>

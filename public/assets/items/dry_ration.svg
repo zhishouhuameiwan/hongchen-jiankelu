@@ -1,8 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 448" role="img" aria-label="干粮">
-  <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#2a1811"/><stop offset="1" stop-color="#b98446"/></linearGradient></defs>
-  <rect width="320" height="448" rx="28" fill="url(#g)"/>
-  <rect x="28" y="28" width="264" height="392" rx="22" fill="none" stroke="#f2d28b" stroke-width="6" opacity=".8"/>
-  <circle cx="160" cy="190" r="82" fill="#f8e4a6" opacity=".22"/>
-  <text x="160" y="216" text-anchor="middle" font-size="92" font-family="serif" fill="#f9e7b8">粮</text>
-  <text x="160" y="346" text-anchor="middle" font-size="30" font-family="serif" fill="#fff2c8">干粮</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 448" role="img" aria-labelledby="dry-ration-title dry-ration-desc" data-art-direction="ancient-wuxia-item" data-item-id="dry_ration">
+  <title id="dry-ration-title">干粮</title>
+  <desc id="dry-ration-desc">古风武侠行囊中的布包行路口粮，草绳扎着几块干饼。</desc>
+  <defs>
+    <linearGradient id="dry-ration-bg" x1="38" y1="24" x2="282" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2a1711"/>
+      <stop offset=".54" stop-color="#6b3d24"/>
+      <stop offset="1" stop-color="#b88445"/>
+    </linearGradient>
+    <radialGradient id="dry-ration-glow" cx="50%" cy="42%" r="58%">
+      <stop stop-color="#ffe0a0" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#ffe0a0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="448" rx="30" fill="url(#dry-ration-bg)"/>
+  <rect x="24" y="24" width="272" height="400" rx="24" fill="none" stroke="#efd08a" stroke-width="5" opacity=".78"/>
+  <circle cx="160" cy="193" r="118" fill="url(#dry-ration-glow)"/>
+  <path d="M76 286 C91 223 101 151 153 124 C203 146 232 213 241 286 C202 314 122 315 76 286Z" fill="#b98b5a" stroke="#4d2a19" stroke-width="5"/>
+  <path d="M98 145 C118 112 181 101 216 134 C206 159 178 171 144 166 C124 163 109 155 98 145Z" fill="#e3c894" stroke="#59331f" stroke-width="4"/>
+  <path d="M90 289 C116 252 138 210 155 127 M231 289 C205 248 183 204 155 127" fill="none" stroke="#7c4b2d" stroke-width="4" opacity=".55"/>
+  <path d="M92 218 C126 204 191 204 227 219" fill="none" stroke="#f1ddb4" stroke-width="5" stroke-linecap="round" opacity=".82"/>
+  <path d="M92 226 C124 249 194 250 229 226" fill="none" stroke="#5d351f" stroke-width="5" stroke-linecap="round"/>
+  <path d="M145 219 C147 237 143 251 130 262 M175 220 C175 238 181 251 194 262" fill="none" stroke="#5d351f" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="123" cy="265" rx="31" ry="17" fill="#d7a862" stroke="#65361d" stroke-width="4"/>
+  <ellipse cx="166" cy="274" rx="34" ry="18" fill="#e0b672" stroke="#65361d" stroke-width="4"/>
+  <ellipse cx="199" cy="259" rx="28" ry="16" fill="#c8914f" stroke="#65361d" stroke-width="4"/>
+  <path d="M108 263 C119 255 136 255 147 263 M151 273 C163 264 182 264 193 273 M188 258 C198 251 212 251 220 258" fill="none" stroke="#f1d597" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+  <path d="M64 333 C104 352 216 354 256 333" fill="none" stroke="#26130d" stroke-width="10" stroke-linecap="round" opacity=".26"/>
+  <text x="160" y="374" text-anchor="middle" font-size="34" font-family="serif" fill="#fff0c4">干粮</text>
+  <text x="160" y="404" text-anchor="middle" font-size="18" font-family="serif" fill="#efd08a">布包行路口粮</text>
 </svg>
