@@ -3,6 +3,7 @@ import { starterDeck } from '../data/cards'
 import type { Choice, EquipmentSlot, GameState, LocationId } from '../types/game'
 import { applyChoice } from '../engine/eventEngine'
 import { useItem } from '../engine/itemEngine'
+import { cookRecipe } from '../engine/cookingEngine'
 import { advancePhase } from '../engine/dayPhaseEngine'
 import { clearSave, hasSavedGame, loadGame, saveGame } from '../engine/saveEngine'
 import { chooseEnding } from '../engine/endingEngine'
@@ -33,6 +34,7 @@ export type GameStore = {
   equipCard: (cardId: string) => void
   unequipSlot: (slot: EquipmentSlot) => void
   useItem: (itemId: string) => void
+  cookRecipe: (recipeId: string) => void
   endTurn: () => void
   finishCombat: (rewardCardId?: string) => void
 }
@@ -41,7 +43,7 @@ export function createInitialGameState(name: string, backgroundId: string): Game
   return {
     screen: 'map', day: 1, phase: 'day', stamina: 6, maxStamina: 6, playerName: name || '无名侠客',
     player: { backgroundId, silver: backgroundId === 'fallen_noble' ? 40 : 20, stats: { hp: backgroundId === 'medicine_apprentice' ? 70 : 60, maxHp: backgroundId === 'medicine_apprentice' ? 70 : 60, innerPower: 3, maxInnerPower: 3, attack: backgroundId === 'wandering_swordsman' ? 6 : 5, defense: 2, agility: backgroundId === 'street_survivor' ? 3 : 2, mind: 5, reputation: backgroundId === 'street_survivor' ? -1 : 0, demonHeart: 0 } },
-    deck: [...starterDeck], equipment: {}, equipmentBag: [], itemBag: {}, flags: [],
+    deck: [...starterDeck], equipment: {}, equipmentBag: [], itemBag: {}, cooking: { knownRecipes: ['steamed_bun'], exp: 0 }, flags: [],
     heroineStates: {
       shen_qingshuang: { id: 'shen_qingshuang', affection: 0, belief: 0, routeStage: 0, locked: false, unlockedCards: [] },
       luo_hongling: { id: 'luo_hongling', affection: 0, belief: 0, routeStage: 0, locked: false, unlockedCards: [] },
@@ -102,6 +104,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   equipCard: (cardId) => { const state = get().state; if (state) set({ state: persist(equipEquipmentCard(state, cardId)) }) },
   unequipSlot: (slot) => { const state = get().state; if (state) set({ state: persist(unequipEquipmentCard(state, slot)) }) },
   useItem: (itemId) => { const state = get().state; if (state) set({ state: persist(useItem(state, itemId)) }) },
+  cookRecipe: (recipeId) => { const state = get().state; if (state) set({ state: persist(cookRecipe(state, recipeId)) }) },
   endTurn: () => { const state = get().state; if (!state?.currentCombat || state.currentCombat.result) return; set({ state: persist(endPlayerTurn(state, enemyById[state.currentCombat.enemyId])) }) },
   finishCombat: (rewardCardId) => {
     const state = get().state; if (!state?.currentCombat) return

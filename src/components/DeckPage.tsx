@@ -2,6 +2,7 @@ import { cards, cardById } from '../data/cards'
 import { cardArtById } from '../data/cardArt'
 import { itemById } from '../data/items'
 import { itemArtById } from '../data/itemArt'
+import { canCookRecipe, cookingRecipes, getCookingLevel } from '../engine/cookingEngine'
 import { equipmentSlotLabels, getEquipmentBonusText } from '../engine/equipmentEngine'
 import { useGameStore } from '../store/gameStore'
 import { TopBar } from './TopBar'
@@ -19,6 +20,7 @@ export function DeckPage() {
   const equipCard = useGameStore((s) => s.equipCard)
   const unequipSlot = useGameStore((s) => s.unequipSlot)
   const useBagItem = useGameStore((s) => s.useItem)
+  const cookBagRecipe = useGameStore((s) => s.cookRecipe)
   const groupedDeck = state.deck.reduce<Record<string, string[]>>((groups, id) => {
     const label = getDeckGroupLabel(cardById[id].source)
     groups[label] = [...(groups[label] ?? []), id]
@@ -30,6 +32,8 @@ export function DeckPage() {
   ]))
 
   const itemEntries = Object.entries(state.itemBag).filter(([, count]) => count > 0)
+  const cookingLevel = getCookingLevel(state)
+  const knownRecipes = cookingRecipes.filter((recipe) => state.cooking.knownRecipes.includes(recipe.id) && recipe.requiredLevel <= cookingLevel)
 
   return (
     <main>
@@ -43,19 +47,43 @@ export function DeckPage() {
             {itemEntries.map(([id, count]) => {
               const item = itemById[id]
               if (!item) return null
-              const usable = item.category === 'consumable' && item.effects.length > 0
+              const usable = ['consumable', 'food'].includes(item.category) && item.effects.length > 0
+              const categoryLabel = item.category === 'food' ? '食物' : item.category === 'ingredient' ? '食材' : item.category === 'consumable' ? '消耗品' : '任务物品'
               return (
                 <article className="card deck-card deck-card--compact item-card" key={id}>
                   <img className="card-art card-image" src={itemArtById[id]} alt={`${item.name}插画`} />
                   <h3>{item.name} ×{count}</h3>
                   <p>{item.description}</p>
-                  <small>{item.category === 'consumable' ? '消耗品' : '任务物品'} · {item.source}</small>
-                  {usable ? <button onClick={() => useBagItem(id)}>使用{item.name}</button> : <button disabled>不可使用</button>}
+                  <small>{categoryLabel} · {item.source}</small>
+                  {usable ? <button onClick={() => useBagItem(id)}>{item.category === 'food' ? '食用' : '使用'}{item.name}</button> : <button disabled>不可使用</button>}
                 </article>
               )
             })}
           </div>
         ) : <p className="menu-hint">暂无物品。可从医馆、镇集或江湖事件获得。</p>}
+      </section>
+      <section className="deck-group cooking-panel">
+        <h2>厨艺</h2>
+        <p className="menu-hint">厨艺等级 {cookingLevel} · 经验 {state.cooking.exp}</p>
+        {knownRecipes.length ? (
+          <div className="grid equipment-bag" aria-label="厨艺菜谱">
+            {knownRecipes.map((recipe) => {
+              const output = itemById[recipe.outputItemId]
+              const ingredientText = recipe.ingredients.map((ingredient) => `${itemById[ingredient.itemId]?.name ?? ingredient.itemId} ×${ingredient.amount}`).join('、')
+              const ready = canCookRecipe(state, recipe.id)
+              return (
+                <article className="card deck-card deck-card--compact item-card" key={recipe.id}>
+                  <img className="card-art card-image" src={itemArtById[recipe.outputItemId]} alt={`${recipe.name}成品`} />
+                  <h3>{recipe.name}</h3>
+                  <p>{recipe.description}</p>
+                  <small>所需：{ingredientText}</small>
+                  <small>成品：{output?.name ?? recipe.outputItemId} · 厨艺 +{recipe.expGain}</small>
+                  <button disabled={!ready} onClick={() => cookBagRecipe(recipe.id)}>{ready ? `烹饪${recipe.name}` : '材料不足'}</button>
+                </article>
+              )
+            })}
+          </div>
+        ) : <p className="menu-hint">暂无可烹饪菜谱。可在茶馆、客栈或医馆学到新菜。</p>}
       </section>
       <section className="deck-group equipment-panel">
         <h2>装备</h2>

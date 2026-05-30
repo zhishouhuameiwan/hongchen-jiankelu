@@ -11,7 +11,7 @@ export const events: GameEvent[] = [
   ] },
   { id: 'town_bandit_notice_01', title: '镖局悬赏', phase: 'day', locationId: 'town', weight: 20, requirements: [], text: '镖局贴出悬赏：黑松林劫匪近日频繁出没。', choices: [
     { id: 'accept', text: '接下悬赏', staminaCost: 2, effects: [{ type: 'start_combat', enemyId: 'bandit' }] },
-    { id: 'work', text: '帮忙搬运货物', staminaCost: 1, effects: [{ type: 'gain_silver', value: 6 }, { type: 'gain_item', itemId: 'dry_ration' }] },
+    { id: 'work', text: '帮忙搬运货物', staminaCost: 1, effects: [{ type: 'gain_silver', value: 6 }, { type: 'gain_item', itemId: 'dry_ration' }, { type: 'gain_item', itemId: 'wheat_flour' }] },
   ] },
   { id: 'town_weapon_stall_01', title: '街口兵器摊', phase: 'day', locationId: 'town', weight: 34, requirements: [{ type: 'flag_missing', value: 'visited_weapon_stall' }], text: '镇口铁匠支起兵器摊，粗铁剑、寒铁刀、编竹护甲、踏影靴与平安玉符并排摆着，价钱写在木牌上。', choices: [
     { id: 'buy_sword', text: '买下粗铁剑（12 两）', staminaCost: 1, requirements: [{ type: 'silver_min', value: 12 }], effects: [{ type: 'gain_silver', value: -12 }, { type: 'gain_card', cardId: 'plain_iron_sword' }, { type: 'set_flag', value: 'visited_weapon_stall' }] },
@@ -57,8 +57,8 @@ export const events: GameEvent[] = [
     { id: 'heal', text: '请她疗伤', staminaCost: 1, effects: [{ type: 'heal', value: 12 }, { type: 'gain_item', itemId: 'small_healing_pill' }, { type: 'heroine_affection', heroine: 'bai_zhi', value: 4 }] },
   ] },
   { id: 'clinic_baizhi_route_02', title: '药香问心', phase: 'day', locationId: 'clinic', weight: 132, requirements: [{ type: 'heroine_stage', heroine: 'bai_zhi', value: 1 }, { type: 'heroine_affection_min', heroine: 'bai_zhi', value: 10 }, { type: 'flag_missing', value: 'route_locked_shen_qingshuang' }, { type: 'flag_missing', value: 'route_locked_luo_hongling' }], text: '白芷把脉后沉默许久。她说血河经不是武学，而是一种会传染人心的病。', choices: [
-    { id: 'study', text: '帮她整理医案', staminaCost: 2, effects: [{ type: 'heroine_affection', heroine: 'bai_zhi', value: 14 }, { type: 'heroine_belief', heroine: 'bai_zhi', value: 12 }, { type: 'heroine_stage', heroine: 'bai_zhi', value: 2 }, { type: 'lock_route', heroine: 'bai_zhi' }, { type: 'gain_card', cardId: 'clear_mind_powder' }] },
-    { id: 'medicine', text: '购买清心药材', staminaCost: 1, effects: [{ type: 'gain_silver', value: -8 }, { type: 'heal', value: 18 }, { type: 'gain_item', itemId: 'qi_recovery_powder' }, { type: 'heroine_affection', heroine: 'bai_zhi', value: 4 }] },
+    { id: 'study', text: '帮她整理医案', staminaCost: 2, effects: [{ type: 'heroine_affection', heroine: 'bai_zhi', value: 14 }, { type: 'heroine_belief', heroine: 'bai_zhi', value: 12 }, { type: 'heroine_stage', heroine: 'bai_zhi', value: 2 }, { type: 'lock_route', heroine: 'bai_zhi' }, { type: 'gain_card', cardId: 'clear_mind_powder' }, { type: 'learn_recipe', recipeId: 'herb_chicken_soup' }] },
+    { id: 'medicine', text: '购买清心药材', staminaCost: 1, effects: [{ type: 'gain_silver', value: -8 }, { type: 'heal', value: 18 }, { type: 'gain_item', itemId: 'qi_recovery_powder' }, { type: 'gain_item', itemId: 'young_chicken' }, { type: 'heroine_affection', heroine: 'bai_zhi', value: 4 }] },
   ] },
   { id: 'clinic_baizhi_route_03', title: '药谷解方', phase: 'day', locationId: 'clinic', weight: 188, requirements: [{ type: 'heroine_stage', heroine: 'bai_zhi', value: 2 }, { type: 'heroine_affection_min', heroine: 'bai_zhi', value: 24 }, { type: 'heroine_belief_min', heroine: 'bai_zhi', value: 20 }, { type: 'flag', value: 'blood_river_clue' }, { type: 'flag', value: 'route_locked_bai_zhi' }], text: '白芷终于写出解方，但需要有人以内力引毒。她看着你，第一次露出害怕失去的神情。', choices: [
     { id: 'cure', text: '以内力试药', staminaCost: 2, effects: [{ type: 'heroine_affection', heroine: 'bai_zhi', value: 10 }, { type: 'set_flag', value: 'blood_river_cured' }, { type: 'gain_card', cardId: 'life_returning_needle' }, { type: 'stat', stat: 'mind', value: 2 }, { type: 'heroine_stage', heroine: 'bai_zhi', value: 3 }] },
@@ -70,7 +70,7 @@ export const events: GameEvent[] = [
   ] },
   { id: 'forest_inner_power_trial_01', title: '寒潭运功', phase: 'day', locationId: 'forest', weight: 36, requirements: [{ type: 'flag_missing', value: 'completed_inner_power_trial' }], text: '黑松林深处有一口寒潭，老渔翁说若能在潭边行功一周天，便能拓宽经脉，但稍有不慎就会寒气入体。', choices: [
     { id: 'meditate', text: '冒寒运功拓宽经脉', staminaCost: 2, effects: [{ type: 'set_flag', value: 'completed_inner_power_trial' }, { type: 'stat', stat: 'maxInnerPower', value: 1 }, { type: 'stat', stat: 'innerPower', value: 1 }, { type: 'damage', value: 6 }] },
-    { id: 'camp', text: '稳妥扎营恢复脚力', staminaCost: 1, effects: [{ type: 'set_flag', value: 'completed_inner_power_trial' }, { type: 'increase_max_stamina', value: 1 }, { type: 'heal', value: 6 }] },
+    { id: 'camp', text: '稳妥扎营恢复脚力', staminaCost: 1, effects: [{ type: 'set_flag', value: 'completed_inner_power_trial' }, { type: 'increase_max_stamina', value: 1 }, { type: 'heal', value: 6 }, { type: 'gain_item', itemId: 'spring_water' }, { type: 'gain_item', itemId: 'wild_herb' }] },
   ] },
   { id: 'ruined_temple_black_market_ambush_01', title: '黑市截杀', phase: 'night', locationId: 'ruined_temple', weight: 75, requirements: [{ type: 'flag_missing', value: 'black_market_ambush_resolved' }], text: '破庙黑市灯火摇曳，几名蒙面客盯上你腰间的钱袋。夜路有利可图，也有血光。', choices: [
     { id: 'fight_back', text: '拔剑反截这笔黑吃黑', staminaCost: 2, effects: [{ type: 'set_flag', value: 'black_market_ambush_resolved' }, { type: 'start_combat', enemyId: 'black_market_master' }, { type: 'gain_silver', value: 30 }] },

@@ -3,6 +3,7 @@ import { startCombat } from './combatEngine'
 import { enemyById } from '../data/enemies'
 import { cardById } from '../data/cards'
 import { itemById } from '../data/items'
+import { recipeById } from './cookingEngine'
 import { heroines } from '../data/world'
 
 export function applyEffect(state: GameState, effect: Effect): GameState {
@@ -33,6 +34,11 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
       next.itemBag[effect.itemId] = (next.itemBag[effect.itemId] ?? 0) + amount
       return next
     }
+    case 'learn_recipe': {
+      if (recipeById[effect.recipeId] && !next.cooking.knownRecipes.includes(effect.recipeId)) next.cooking.knownRecipes.push(effect.recipeId)
+      return next
+    }
+    case 'gain_cooking_exp': next.cooking.exp += effect.value; return next
     case 'heal': next.player.stats.hp = Math.min(next.player.stats.maxHp, next.player.stats.hp + effect.value); return next
     case 'damage': next.player.stats.hp = Math.max(0, next.player.stats.hp - effect.value); return next
     case 'stat': {

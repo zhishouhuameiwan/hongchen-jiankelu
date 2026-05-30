@@ -46,6 +46,8 @@ export type Effect =
   | { type: 'gain_silver'; value: number }
   | { type: 'gain_card'; cardId: string }
   | { type: 'gain_item'; itemId: string; amount?: number }
+  | { type: 'learn_recipe'; recipeId: string }
+  | { type: 'gain_cooking_exp'; value: number }
   | { type: 'heal'; value: number }
   | { type: 'damage'; value: number }
   | { type: 'stat'; stat: StatKey; value: number }
@@ -66,7 +68,11 @@ export type ItemEffect =
   | { type: 'restore_stamina'; value: number }
   | { type: 'restore_inner_power'; value: number }
 
-export type ItemDefinition = { id: string; name: string; category: 'consumable' | 'quest'; description: string; effects: ItemEffect[]; source: string }
+export type ItemCategory = 'consumable' | 'food' | 'ingredient' | 'quest'
+export type ItemDefinition = { id: string; name: string; category: ItemCategory; description: string; effects: ItemEffect[]; source: string }
+export type CookingState = { knownRecipes: string[]; exp: number }
+export type CookingIngredient = { itemId: string; amount: number }
+export type CookingRecipe = { id: string; name: string; outputItemId: string; ingredients: CookingIngredient[]; requiredLevel: number; expGain: number; description: string }
 
 export type EquipmentSlot = 'weapon' | 'armor' | 'boots' | 'accessory'
 export type EquipmentBonus = { stat: Exclude<StatKey, 'silver'>; value: number }
@@ -98,6 +104,7 @@ export type GameState = {
   equipment: Partial<Record<EquipmentSlot, string>>
   equipmentBag: string[]
   itemBag: Record<string, number>
+  cooking: CookingState
   flags: string[]
   heroineStates: Record<HeroineId, HeroineState>
   currentLocationId?: LocationId

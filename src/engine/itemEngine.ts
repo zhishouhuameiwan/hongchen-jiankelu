@@ -20,11 +20,11 @@ export function gainItem(state: GameState, itemId: string, amount = 1): GameStat
 export function useItem(state: GameState, itemId: string): GameState {
   const item = itemById[itemId]
   const count = state.itemBag[itemId] ?? 0
-  if (!item || item.category !== 'consumable' || count <= 0) return state
+  if (!item || !['consumable', 'food'].includes(item.category) || count <= 0) return state
   const afterEffects = item.effects.reduce((current, effect) => applyItemEffect(current, effect), state)
   const nextCount = count - 1
   const itemBag = { ...afterEffects.itemBag }
   if (nextCount > 0) itemBag[itemId] = nextCount
   else delete itemBag[itemId]
-  return { ...afterEffects, itemBag, log: [...afterEffects.log, `使用物品：${item.name}。`] }
+  return { ...afterEffects, itemBag, log: [...afterEffects.log, `${item.category === 'food' ? '食用' : '使用物品'}：${item.name}。`] }
 }
