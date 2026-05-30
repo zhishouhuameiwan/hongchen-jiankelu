@@ -51,7 +51,7 @@ export function DeckPage() {
               const categoryLabel = item.category === 'food' ? '食物' : item.category === 'ingredient' ? '食材' : item.category === 'consumable' ? '消耗品' : '任务物品'
               return (
                 <article className="card deck-card deck-card--compact item-card" key={id}>
-                  <img className="card-art card-image" src={itemArtById[id]} alt={`${item.name}插画`} />
+                  <img className="item-art compact-asset-image" src={itemArtById[id]} alt={`${item.name}插画`} />
                   <h3>{item.name} ×{count}</h3>
                   <p>{item.description}</p>
                   <small>{categoryLabel} · {item.source}</small>
@@ -73,7 +73,7 @@ export function DeckPage() {
               const ready = canCookRecipe(state, recipe.id)
               return (
                 <article className="card deck-card deck-card--compact item-card" key={recipe.id}>
-                  <img className="card-art card-image" src={itemArtById[recipe.outputItemId]} alt={`${recipe.name}成品`} />
+                  <img className="cooking-art compact-asset-image" src={itemArtById[recipe.outputItemId]} alt={`${recipe.name}成品`} />
                   <h3>{recipe.name}</h3>
                   <p>{recipe.description}</p>
                   <small>所需：{ingredientText}</small>
@@ -110,7 +110,7 @@ export function DeckPage() {
               const equipped = card.equipmentSlot ? state.equipment[card.equipmentSlot] === id : false
               return (
                 <article className="card deck-card deck-card--compact equipment-card" key={id}>
-                  <img className="card-art card-image" src={cardArtById[id]} alt={`${card.name}插画`} />
+                  <img className="equipment-art compact-asset-image" src={cardArtById[id]} alt={`${card.name}插画`} />
                   <h3>{card.name}</h3>
                   <p>{card.description}</p>
                   <small>{card.equipmentSlot ? equipmentSlotLabels[card.equipmentSlot] : '装备'} · {getEquipmentBonusText(id)}</small>

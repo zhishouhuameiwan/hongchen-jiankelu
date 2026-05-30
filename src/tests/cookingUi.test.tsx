@@ -18,6 +18,8 @@ describe('cooking UI', () => {
     expect(screen.getByText('厨艺')).toBeInTheDocument()
     expect(screen.getByText('厨艺等级 1 · 经验 0')).toBeInTheDocument()
     expect(screen.getByText(/麦粉 ×1、山泉水 ×1/)).toBeInTheDocument()
+    expect(screen.getByAltText('蒸饼成品')).toHaveClass('cooking-art', 'compact-asset-image')
+    expect(screen.getByAltText('蒸饼成品')).not.toHaveClass('card-art')
 
     fireEvent.click(screen.getByRole('button', { name: '烹饪蒸饼' }))
 

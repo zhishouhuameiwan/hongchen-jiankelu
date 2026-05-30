@@ -133,7 +133,10 @@ def metadata_for_active_path(relative_path: Path) -> Callable[[Path], None]:
     if rel.startswith('cards/'):
         if stem not in CARD_META:
             raise KeyError(f'Missing card metadata for active asset: {rel}')
-        return lambda path: write_card(path, stem, CARD_META[stem])
+        meta = CARD_META[stem]
+        if meta[1] == 'equipment':
+            return lambda path: write_equipment(path, stem, meta)
+        return lambda path: write_card(path, stem, meta)
 
     if rel.startswith('figures/players/'):
         if stem not in PLAYER_META:
@@ -197,6 +200,37 @@ def write_card(path: Path, cid: str, meta: tuple[str, str, str, str, str, str]) 
 '''
     path.write_text(content, encoding='utf-8')
 
+def equipment_shape(motif: str) -> str:
+    if 'sword' in motif:
+        return '<path d="M52 92L78 36l10 10-30 54z" fill="#f6e6bd" stroke="#24160f" stroke-width="2"/><path d="M45 100l18-10 8 8-10 18z" fill="#5a2a18"/><path d="M58 84l20 20" stroke="#f6e6bd" stroke-width="5" stroke-linecap="round"/>'
+    if motif == 'armor':
+        return '<path d="M60 36c16 10 28 12 42 12-2 42-16 72-42 90-26-18-40-48-42-90 14 0 26-2 42-12z" fill="#f0d49a" stroke="#24160f" stroke-width="3"/><path d="M60 46v78M32 72h56" stroke="#7b4d25" stroke-width="4" opacity=".72"/>'
+    if motif == 'boots':
+        return '<path d="M36 54h26l-4 50c16 7 27 13 34 24H34c-8 0-12-5-9-12 6-12 10-28 11-62z" fill="#2b1c1a" stroke="#f6e6bd" stroke-width="3"/><path d="M64 58h18l-2 44c10 6 18 12 24 22H70" fill="none" stroke="#f6e6bd" stroke-width="3"/>'
+    if motif == 'talisman':
+        return '<path d="M60 34c20 18 30 35 30 55s-12 38-30 55c-18-17-30-35-30-55s10-37 30-55z" fill="#bfe6b8" stroke="#24160f" stroke-width="3"/><circle cx="60" cy="80" r="15" fill="#fff3cf" opacity=".8"/><path d="M60 54v70M42 88h36" stroke="#6c3d25" stroke-width="4" opacity=".7"/>'
+    return '<circle cx="60" cy="78" r="34" fill="#f0d49a" stroke="#24160f" stroke-width="3"/>'
+
+
+def write_equipment(path: Path, cid: str, meta: tuple[str, str, str, str, str, str]) -> None:
+    name, typ, source, subtitle, color, motif = meta
+    icon = equipment_shape(motif)
+    content = f"""<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="{esc(name)} · 古风武侠装备道具" data-art-direction="ancient-wuxia-equipment" data-kind="equipment" data-card-id="{esc(cid)}" data-theme="古风武侠江湖水墨装备道具">
+  <title>{esc(name)} · 古风武侠装备道具</title>
+  <desc>小尺寸古风武侠装备道具图标：{esc(subtitle)}。用于装备行囊展示，不使用战斗卡牌插画风格。</desc>
+  <defs><radialGradient id="g" cx="50%" cy="38%" r="68%"><stop stop-color="#fff2d1"/><stop offset=".58" stop-color="{color}"/><stop offset="1" stop-color="#100805"/></radialGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#120c08"/>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="url(#g)"/>
+  <path d="M24 113c18-16 52-17 74-2" stroke="#100805" stroke-width="8" stroke-linecap="round" fill="none" opacity=".25"/>
+  {icon}
+  <rect x="10" y="119" width="100" height="22" rx="7" fill="#080504" opacity=".72"/>
+  <text x="60" y="134" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="12" font-weight="700" fill="#fff1ca">{esc(name)}</text>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="none" stroke="#f1d99f" stroke-width="1.5" opacity=".76"/>
+</svg>
+"""
+    path.write_text(content, encoding='utf-8')
+
+
 def motif_shape(motif: str) -> str:
     base = 'fill="#f5d99a" stroke="#fff5d8" stroke-width="6" stroke-linejoin="round" opacity=".92"'
     if 'sword' in motif or motif in {'two_swords'}:
@@ -259,9 +293,14 @@ def write_figure(path: Path, fid: str, name: str, role: str, color: str, desc: s
 
 def write_item(path: Path, iid: str, meta: tuple[str, str, str]) -> None:
     name, color, desc = meta
-    content = f'''<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="{esc(name)} · 古风武侠道具" data-art-direction="ancient-wuxia-item" data-kind="item" data-item-id="{esc(iid)}" data-theme="古风武侠江湖水墨道具">
-  <title>{esc(name)} · 古风武侠道具</title>
-  <desc>{esc(desc)}，小尺寸古风武侠道具图标，适用于背包、厨艺与卡片展示。</desc>
+    food_ids = {'dry_ration', 'steamed_bun', 'herb_chicken_soup'}
+    ingredient_ids = {'wheat_flour', 'spring_water', 'wild_herb', 'young_chicken'}
+    kind = 'food' if iid in food_ids else 'ingredient' if iid in ingredient_ids else 'item'
+    label = '食物' if kind == 'food' else '食材' if kind == 'ingredient' else '道具'
+    art_direction = 'ancient-wuxia-cooking' if kind in {'food', 'ingredient'} else 'ancient-wuxia-item'
+    content = f'''<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="{esc(name)} · 古风武侠{label}" data-art-direction="{art_direction}" data-kind="{kind}" data-item-id="{esc(iid)}" data-theme="古风武侠江湖水墨厨艺食物食材道具">
+  <title>{esc(name)} · 古风武侠{label}</title>
+  <desc>{esc(desc)}，小尺寸古风武侠{label}图标，适用于背包、厨艺与卡片展示。</desc>
   <defs><radialGradient id="g" cx="50%" cy="36%" r="68%"><stop stop-color="#fff2d1"/><stop offset=".56" stop-color="{color}"/><stop offset="1" stop-color="#100805"/></radialGradient></defs>
   <rect width="120" height="160" rx="10" fill="#120c08"/>
   <rect x="6" y="6" width="108" height="148" rx="8" fill="url(#g)"/>
@@ -334,3 +373,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+

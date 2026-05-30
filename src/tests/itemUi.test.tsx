@@ -18,7 +18,8 @@ describe('item UI', () => {
 
     expect(screen.getByText('物品')).toBeInTheDocument()
     expect(screen.getByText('小还丹 ×1')).toBeInTheDocument()
-    expect(screen.getByAltText('小还丹插画')).toBeInTheDocument()
+    expect(screen.getByAltText('小还丹插画')).toHaveClass('item-art', 'compact-asset-image')
+    expect(screen.getByAltText('小还丹插画')).not.toHaveClass('card-art')
 
     fireEvent.click(screen.getByRole('button', { name: '使用小还丹' }))
 

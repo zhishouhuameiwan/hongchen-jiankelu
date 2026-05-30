@@ -21,7 +21,8 @@ describe('equipment UI', () => {
 
     expect(screen.getByText('装备')).toBeInTheDocument()
     expect(screen.getByText('粗铁剑')).toBeInTheDocument()
-    expect(screen.getByAltText('粗铁剑插画')).toBeInTheDocument()
+    expect(screen.getByAltText('粗铁剑插画')).toHaveClass('equipment-art', 'compact-asset-image')
+    expect(screen.getByAltText('粗铁剑插画')).not.toHaveClass('card-art')
     expect(screen.getByText('武器 · 攻击 +2')).toBeInTheDocument()
     expect(screen.getAllByText('装备中：无').length).toBeGreaterThan(0)
 

@@ -15,7 +15,10 @@ describe('item art assets', () => {
       expect(path).toBe(`/assets/items/${item.id}.svg`)
 
       const svg = readFileSync(join(assetRoot, `${item.id}.svg`), 'utf-8')
-      expect(svg).toContain('data-art-direction="ancient-wuxia-item"')
+      const expectedArtDirection = item.source === 'cooking' || item.category === 'food' || item.category === 'ingredient'
+        ? 'ancient-wuxia-cooking'
+        : 'ancient-wuxia-item'
+      expect(svg).toContain(`data-art-direction="${expectedArtDirection}"`)
       expect(svg).toContain(`data-item-id="${item.id}"`)
       expect(svg).toContain(item.name)
     }

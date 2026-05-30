@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="野山草 · 古风武侠道具" data-art-direction="ancient-wuxia-item" data-kind="item" data-item-id="wild_herb" data-theme="古风武侠江湖水墨道具">
-  <title>野山草 · 古风武侠道具</title>
-  <desc>山林草药束，小尺寸古风武侠道具图标，适用于背包、厨艺与卡片展示。</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="野山草 · 古风武侠食材" data-art-direction="ancient-wuxia-cooking" data-kind="ingredient" data-item-id="wild_herb" data-theme="古风武侠江湖水墨厨艺食物食材道具">
+  <title>野山草 · 古风武侠食材</title>
+  <desc>山林草药束，小尺寸古风武侠食材图标，适用于背包、厨艺与卡片展示。</desc>
   <defs><radialGradient id="g" cx="50%" cy="36%" r="68%"><stop stop-color="#fff2d1"/><stop offset=".56" stop-color="#5f9856"/><stop offset="1" stop-color="#100805"/></radialGradient></defs>
   <rect width="120" height="160" rx="10" fill="#120c08"/>
   <rect x="6" y="6" width="108" height="148" rx="8" fill="url(#g)"/>

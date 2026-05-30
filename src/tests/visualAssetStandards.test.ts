@@ -65,4 +65,21 @@ describe('visual asset size standards', () => {
       expect(svg, expectation.kind).toMatch(/古风武侠|水墨|江湖/)
     }
   })
+
+  it('marks equipment and cooking assets as object art instead of generic combat card art', () => {
+    const equipmentCards = cards.filter((card) => card.type === 'equipment')
+    for (const card of equipmentCards) {
+      const svg = svgFor(cardArtById[card.id])
+      expect(svg, `equipment ${card.id}`).toMatch(/data-kind="equipment"/)
+      expect(svg, `equipment ${card.id}`).toMatch(/装备|道具/)
+      expect(svg, `equipment ${card.id}`).not.toMatch(/data-kind="card"/)
+    }
+
+    const cookingItems = items.filter((item) => item.source === 'cooking' || item.category === 'food' || item.category === 'ingredient')
+    for (const item of cookingItems) {
+      const svg = svgFor(itemArtById[item.id])
+      expect(svg, `cooking item ${item.id}`).toMatch(/data-kind="(?:food|ingredient)"/)
+      expect(svg, `cooking item ${item.id}`).toMatch(/厨艺|食物|食材/)
+    }
+  })
 })
