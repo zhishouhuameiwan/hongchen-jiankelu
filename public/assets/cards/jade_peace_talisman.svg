@@ -1,16 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 336" role="img" aria-labelledby="title desc">
-  <title id="title">平安玉符</title>
-  <desc id="desc">武侠装备卡牌插画：平安玉符</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#2b2118"/>
-      <stop offset="1" stop-color="#76d7c4"/>
-    </linearGradient>
-  </defs>
-  <rect width="240" height="336" rx="24" fill="url(#bg)"/>
-  <rect x="18" y="18" width="204" height="300" rx="18" fill="none" stroke="#f4df9b" stroke-width="5"/>
-  <circle cx="120" cy="142" r="58" fill="#f7ead0" opacity="0.92"/>
-  <text x="120" y="164" text-anchor="middle" font-size="66" font-family="serif" fill="#1f7a66">符</text>
-  <path d="M62 230 C94 206 146 206 178 230" fill="none" stroke="#f4df9b" stroke-width="8" stroke-linecap="round"/>
-  <text x="120" y="284" text-anchor="middle" font-size="28" font-family="serif" fill="#fff4c2">平安玉符</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="平安玉符 · 古风武侠卡牌" data-art-direction="ancient-wuxia" data-kind="card" data-card-id="jade_peace_talisman" data-theme="古风武侠江湖水墨">
+  <title>平安玉符 · 古风武侠卡牌</title>
+  <desc>古风武侠江湖水墨小卡插画：平安玉符对应招式为温玉护身 · 气血安宁，以飞墨、剑气和卷轴纸纹表现招式气韵。</desc>
+  <defs><linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.55" stop-color="#6c9b76"/><stop offset="1" stop-color="#100b09"/></linearGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#120c08"/>
+  <rect x="5" y="5" width="110" height="150" rx="8" fill="url(#paper)"/>
+  <path d="M0 92c18-16 32-14 48-5 16 10 28 10 46 0 12-7 20-7 26 2v71H0z" fill="#050403" opacity=".32"/>
+  <g transform="translate(60 63) scale(.16)"><circle r="132" fill="#f5d99a" stroke="#fff5d8" stroke-width="6" stroke-linejoin="round" opacity=".92"/><path d="M-115 0h230M0-115v230" stroke="#7b2d20" stroke-width="16" opacity=".5"/></g>
+  <rect x="10" y="112" width="100" height="28" rx="7" fill="#080504" opacity=".72"/>
+  <text x="60" y="129" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="12" font-weight="700" fill="#fff1ca">平安玉符</text>
+  <text x="60" y="145" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="6" fill="#ead8ad">equipment · 古风武侠</text>
+  <rect x="5" y="5" width="110" height="150" rx="8" fill="none" stroke="#f1d99f" stroke-width="1.5" opacity=".76"/>
 </svg>

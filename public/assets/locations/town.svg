@@ -1,23 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="青石镇 · 古风武侠场景" data-art-direction="ancient-wuxia" data-kind="location" data-location-id="town" data-theme="古风武侠江湖水墨场景">
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="青石镇 · 古风武侠场景" data-art-direction="ancient-wuxia" data-kind="location" data-location-id="town" data-theme="古风武侠江湖水墨场景">
   <title>青石镇 · 古风武侠场景</title>
-  <desc>青石镇古风武侠场景插画：青石街巷、客栈幡旗、镖局门楼、市井江湖消息与远山晨雾。江湖水墨、卷轴纸纹、飞檐、山水留白与古风武侠氛围。</desc>
-  <defs>
-    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.52" stop-color="#6f4d32"/><stop offset="1" stop-color="#100b09"/></linearGradient>
-    <radialGradient id="halo" cx="50%" cy="28%" r="62%"><stop stop-color="#f3dfb7" stop-opacity=".55"/><stop offset="1" stop-color="#050403" stop-opacity=".62"/></radialGradient>
-    <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="17"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .16"/></feComponentTransfer></filter>
-    <pattern id="cloud" width="96" height="44" patternUnits="userSpaceOnUse"><path d="M5 29c18-20 40-20 56 0 10-8 23-9 34 0" fill="none" stroke="#f3dfb7" stroke-width="2" opacity=".20"/></pattern>
-  </defs>
-  <rect width="640" height="360" rx="28" fill="#100b08"/>
-  <rect x="12" y="12" width="616" height="336" rx="22" fill="url(#paper)"/>
-  <rect x="12" y="12" width="616" height="336" rx="22" fill="url(#cloud)"/>
-  <rect x="12" y="12" width="616" height="336" rx="22" filter="url(#ink)"/>
-  <path d="M0 244c78-62 138-66 210-24 82 48 156 43 236-2 72-40 132-34 194 22v120H0z" fill="#050403" opacity=".28"/>
-  <path d="M38 158c78-64 150-84 242-56 76 23 132 14 214-38 40-25 72-30 108-15" fill="none" stroke="#fff1cd" stroke-width="7" stroke-linecap="round" opacity=".2"/>
-  <path d="M58 284c142-50 330-42 522-96" fill="none" stroke="#fff1cd" stroke-width="5" stroke-linecap="round" opacity=".2"/>
-  <g><path d="M88 402V252h126v150M122 252v-72h70v72M78 402h510M424 402V216h120v186M408 216l76-62 76 62" fill="#24160e" stroke="#f4db9f" stroke-width="8" opacity=".86"/><path d="M132 304h46M456 270h56M456 322h56" stroke="#f4db9f" stroke-width="8" opacity=".58"/></g>
-  <rect x="34" y="254" width="256" height="70" rx="18" fill="#080504" opacity=".72"/>
-  <text x="162" y="298" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="31" font-weight="700" fill="#fff1ca">青石镇</text>
-  <text x="486" y="314" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="20" fill="#f2d18f" opacity=".88">古风武侠 · 江湖水墨</text>
-  <rect x="12" y="12" width="616" height="336" rx="22" fill="url(#halo)"/>
-  <rect x="12" y="12" width="616" height="336" rx="22" fill="none" stroke="#f1d99f" stroke-width="3" opacity=".76"/>
+  <desc>青石镇古风武侠小场景插画：青石街巷、客栈幡旗、镖局门楼、市井江湖消息与远山晨雾。江湖水墨、卷轴纸纹、飞檐、山水留白与古风武侠氛围。</desc>
+  <defs><linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.52" stop-color="#6f4d32"/><stop offset="1" stop-color="#100b09"/></linearGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#100b08"/>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="url(#paper)"/>
+  <path d="M0 98c18-16 30-15 46-6 17 10 30 10 48 0 12-7 20-7 26 2v66H0z" fill="#050403" opacity=".28"/>
+  <g transform="translate(0 5) scale(.19 .25)"><path d="M88 402V252h126v150M122 252v-72h70v72M78 402h510M424 402V216h120v186M408 216l76-62 76 62" fill="#24160e" stroke="#f4db9f" stroke-width="8" opacity=".86"/><path d="M132 304h46M456 270h56M456 322h56" stroke="#f4db9f" stroke-width="8" opacity=".58"/></g>
+  <rect x="10" y="112" width="100" height="28" rx="7" fill="#080504" opacity=".72"/>
+  <text x="60" y="130" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="12" font-weight="700" fill="#fff1ca">青石镇</text>
+  <text x="60" y="145" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="6" fill="#f2d18f" opacity=".88">古风武侠 · 江湖水墨</text>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="none" stroke="#f1d99f" stroke-width="1.5" opacity=".76"/>
 </svg>

@@ -12,6 +12,7 @@ MANIFEST_FILES = [
     ROOT / 'src' / 'data' / 'cardArt.ts',
     ROOT / 'src' / 'data' / 'characterArt.ts',
     ROOT / 'src' / 'data' / 'locationArt.ts',
+    ROOT / 'src' / 'data' / 'itemArt.ts',
 ]
 ACTIVE_DIRECTORIES = (
     'cards/',
@@ -19,6 +20,7 @@ ACTIVE_DIRECTORIES = (
     'figures/enemies/',
     'figures/heroines/',
     'locations/',
+    'items/',
     'statuses/',
 )
 
@@ -38,6 +40,11 @@ CARD_META = {
     'clear_mind_powder': ('清心散', 'romance', 'bai_zhi', '药香清心 · 云散月明', '#81a98a', 'herb'),
     'life_returning_needle': ('回命十三针', 'romance', 'bai_zhi', '十三针落 · 命火重燃', '#c7b98f', 'needles'),
     'blood_river_strike': ('血河逆流', 'demonic', 'blood_river', '血河倒卷 · 魔心噬天', '#7d1021', 'blood_wave'),
+    'plain_iron_sword': ('粗铁剑', 'equipment', 'equipment', '朴拙铁锋 · 初入江湖', '#5c5f5e', 'sword'),
+    'cold_iron_blade': ('寒铁刀', 'equipment', 'equipment', '寒锋出鞘 · 霜声入骨', '#5b7892', 'frost_sword'),
+    'woven_bamboo_armor': ('编竹护甲', 'equipment', 'equipment', '竹甲卸力 · 轻身护体', '#7b6b3b', 'armor'),
+    'shadowstep_boots': ('踏影靴', 'equipment', 'equipment', '轻履无声 · 夜行踏影', '#4d4148', 'boots'),
+    'jade_peace_talisman': ('平安玉符', 'equipment', 'equipment', '温玉护身 · 气血安宁', '#6c9b76', 'talisman'),
 }
 
 PLAYER_META = {
@@ -79,6 +86,22 @@ LOCATION_META = {
     'ruined_temple': ('破庙黑市', '#563c48', '荒废破庙、残佛断梁、黑市灯火、暗摊兵器与亡命江湖客', 'ruined_temple'),
 }
 
+ITEM_META = {
+    'small_healing_pill': ('小还丹', '#8f2e4b', '瓷瓶丹丸，江湖伤药'),
+    'dry_ration': ('干粮', '#8a6237', '粗布包裹的行路口粮'),
+    'steamed_bun': ('蒸饼', '#c8a26a', '热气麦面蒸饼'),
+    'herb_chicken_soup': ('药膳鸡汤', '#9a6a35', '药香鸡汤小盅'),
+    'wheat_flour': ('麦粉', '#d4c094', '小袋麦粉'),
+    'spring_water': ('山泉水', '#4f8fa8', '清冽水囊'),
+    'wild_herb': ('野山草', '#5f9856', '山林草药束'),
+    'young_chicken': ('童子鸡', '#b88a55', '小型食材鸡'),
+    'qi_recovery_powder': ('回气散', '#4f7663', '回气药散瓷瓶'),
+    'blood_jade_fragment': ('血玉残片', '#8e1f2b', '血色碎玉'),
+}
+
+SMALL_ART_WIDTH = 120
+SMALL_ART_HEIGHT = 160
+
 
 def esc(s: str) -> str:
     return html.escape(s, quote=True)
@@ -90,7 +113,7 @@ def safe_id(s: str) -> str:
 
 def read_active_asset_paths() -> list[Path]:
     active: set[str] = set()
-    asset_ref = re.compile(r"""['"](/assets/(?:cards|figures/(?:players|enemies|heroines)|locations|statuses)/[^'"]+\.svg)['"]""")
+    asset_ref = re.compile(r"""['"](/assets/(?:cards|items|figures/(?:players|enemies|heroines)|locations|statuses)/[^'"]+\.svg)['"]""")
 
     for manifest_file in MANIFEST_FILES:
         text = manifest_file.read_text(encoding='utf-8')
@@ -132,6 +155,11 @@ def metadata_for_active_path(relative_path: Path) -> Callable[[Path], None]:
             raise KeyError(f'Missing location metadata for active asset: {rel}')
         return lambda path: write_location(path, stem, LOCATION_META[stem])
 
+    if rel.startswith('items/'):
+        if stem not in ITEM_META:
+            raise KeyError(f'Missing item metadata for active asset: {rel}')
+        return lambda path: write_item(path, stem, ITEM_META[stem])
+
     if rel.startswith('statuses/'):
         if stem not in STATUS_META:
             raise KeyError(f'Missing status metadata for active asset: {rel}')
@@ -153,29 +181,21 @@ def write_card(path: Path, cid: str, meta: tuple[str, str, str, str, str, str]) 
     name, typ, source, subtitle, color, motif = meta
     title = f'{name} · 古风武侠卡牌'
     icon = motif_shape(motif)
-    content = f'''<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1008" viewBox="0 0 720 1008" role="img" aria-label="{esc(title)}" data-art-direction="ancient-wuxia" data-kind="card" data-card-id="{esc(cid)}" data-theme="古风武侠江湖水墨">
+    content = f'''<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="{esc(title)}" data-art-direction="ancient-wuxia" data-kind="card" data-card-id="{esc(cid)}" data-theme="古风武侠江湖水墨">
   <title>{esc(title)}</title>
-  <desc>古风武侠江湖水墨卡牌插画：{esc(name)}对应招式为{esc(subtitle)}，以山水留白、飞墨、剑气和卷轴纸纹表现招式气韵。</desc>
-{frame_defs(color)}
-  <rect width="720" height="1008" rx="48" fill="#120c08"/>
-  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#paper)"/>
-  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#cloud)"/>
-  <rect x="26" y="26" width="668" height="956" rx="38" filter="url(#ink)"/>
-  <path d="M0 555c92-80 154-78 236-25 76 49 143 55 235 6 93-50 157-45 249 34v438H0z" fill="#050403" opacity=".36"/>
-  <path d="M76 280c126-72 276-72 408-14 58 25 103 21 161-18" fill="none" stroke="#fff1cd" stroke-width="8" stroke-linecap="round" opacity=".20"/>
-  <path d="M96 678c140-72 360-38 526-116" fill="none" stroke="#fff1cd" stroke-width="6" stroke-linecap="round" opacity=".18"/>
-  <g transform="translate(360 375)">{icon}</g>
-  <rect x="68" y="712" width="584" height="196" rx="30" fill="#080504" opacity=".70"/>
-  <text x="360" y="780" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="58" font-weight="700" fill="#fff1ca">{esc(name)}</text>
-  <text x="360" y="836" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="28" fill="#f2d18f">{esc(subtitle)}</text>
-  <text x="360" y="882" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="22" fill="#ead8ad">{esc(typ.upper())} · {esc(source)} · 古风武侠</text>
-  <text x="58" y="82" font-family="Georgia, serif" font-size="24" fill="#fff4d8" opacity=".84">江湖</text>
-  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#halo)"/>
-  <rect x="26" y="26" width="668" height="956" rx="38" fill="none" stroke="#f1d99f" stroke-width="3" opacity=".76"/>
+  <desc>古风武侠江湖水墨小卡插画：{esc(name)}对应招式为{esc(subtitle)}，以飞墨、剑气和卷轴纸纹表现招式气韵。</desc>
+  <defs><linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.55" stop-color="{color}"/><stop offset="1" stop-color="#100b09"/></linearGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#120c08"/>
+  <rect x="5" y="5" width="110" height="150" rx="8" fill="url(#paper)"/>
+  <path d="M0 92c18-16 32-14 48-5 16 10 28 10 46 0 12-7 20-7 26 2v71H0z" fill="#050403" opacity=".32"/>
+  <g transform="translate(60 63) scale(.16)">{icon}</g>
+  <rect x="10" y="112" width="100" height="28" rx="7" fill="#080504" opacity=".72"/>
+  <text x="60" y="129" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="12" font-weight="700" fill="#fff1ca">{esc(name)}</text>
+  <text x="60" y="145" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="6" fill="#ead8ad">{esc(typ)} · 古风武侠</text>
+  <rect x="5" y="5" width="110" height="150" rx="8" fill="none" stroke="#f1d99f" stroke-width="1.5" opacity=".76"/>
 </svg>
 '''
     path.write_text(content, encoding='utf-8')
-
 
 def motif_shape(motif: str) -> str:
     base = 'fill="#f5d99a" stroke="#fff5d8" stroke-width="6" stroke-linejoin="round" opacity=".92"'
@@ -237,20 +257,37 @@ def write_figure(path: Path, fid: str, name: str, role: str, color: str, desc: s
     path.write_text(content, encoding='utf-8')
 
 
-def write_status(path: Path, sid: str, meta: tuple[str, str, str]) -> None:
+def write_item(path: Path, iid: str, meta: tuple[str, str, str]) -> None:
     name, color, desc = meta
-    content = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="{esc(name)}状态图标" data-art-direction="ancient-wuxia" data-kind="status" data-theme="古风武侠状态">
-  <title>{esc(name)} · 古风武侠状态</title>
-  <desc>{esc(desc)}，古风武侠江湖水墨符印状态图标。</desc>
-  <defs><radialGradient id="g" cx="50%" cy="38%" r="62%"><stop stop-color="#fff2d1"/><stop offset=".52" stop-color="{color}"/><stop offset="1" stop-color="#100805"/></radialGradient></defs>
-  <circle cx="64" cy="64" r="58" fill="url(#g)"/>
-  <circle cx="64" cy="64" r="50" fill="none" stroke="#fff0c8" stroke-width="4" opacity=".72"/>
-  <path d="M30 70c20-26 46-26 68 0M45 42c10 16 28 16 38 0M64 26v76" fill="none" stroke="#100805" stroke-width="8" stroke-linecap="round" opacity=".58"/>
-  <text x="64" y="75" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="30" fill="#fff4d8">{esc(name[0])}</text>
+    content = f'''<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="{esc(name)} · 古风武侠道具" data-art-direction="ancient-wuxia-item" data-kind="item" data-item-id="{esc(iid)}" data-theme="古风武侠江湖水墨道具">
+  <title>{esc(name)} · 古风武侠道具</title>
+  <desc>{esc(desc)}，小尺寸古风武侠道具图标，适用于背包、厨艺与卡片展示。</desc>
+  <defs><radialGradient id="g" cx="50%" cy="36%" r="68%"><stop stop-color="#fff2d1"/><stop offset=".56" stop-color="{color}"/><stop offset="1" stop-color="#100805"/></radialGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#120c08"/>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="url(#g)"/>
+  <path d="M24 106c20-17 50-20 74-4" stroke="#100805" stroke-width="8" stroke-linecap="round" fill="none" opacity=".28"/>
+  <circle cx="60" cy="66" r="28" fill="#fff2d1" opacity=".34"/>
+  <path d="M38 72c10-24 34-32 48-12 10 14 2 34-23 42-18-6-30-15-25-30z" fill="#100805" opacity=".36"/>
+  <text x="60" y="129" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="12" font-weight="700" fill="#fff1ca">{esc(name)}</text>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="none" stroke="#f1d99f" stroke-width="1.5" opacity=".76"/>
 </svg>
 '''
     path.write_text(content, encoding='utf-8')
 
+def write_status(path: Path, sid: str, meta: tuple[str, str, str]) -> None:
+    name, color, desc = meta
+    content = f'''<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="{esc(name)}状态图标" data-art-direction="ancient-wuxia" data-kind="status" data-theme="古风武侠状态">
+  <title>{esc(name)} · 古风武侠状态</title>
+  <desc>{esc(desc)}，古风武侠江湖水墨符印状态图标。</desc>
+  <defs><radialGradient id="g" cx="50%" cy="38%" r="62%"><stop stop-color="#fff2d1"/><stop offset=".52" stop-color="{color}"/><stop offset="1" stop-color="#100805"/></radialGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#120c08"/>
+  <rect x="8" y="20" width="104" height="104" rx="28" fill="url(#g)"/>
+  <circle cx="60" cy="72" r="38" fill="none" stroke="#fff0c8" stroke-width="4" opacity=".72"/>
+  <path d="M34 76c17-22 39-22 58 0M45 50c10 13 24 13 34 0M60 36v72" fill="none" stroke="#100805" stroke-width="7" stroke-linecap="round" opacity=".58"/>
+  <text x="60" y="137" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="13" fill="#fff4d8">{esc(name)}</text>
+</svg>
+'''
+    path.write_text(content, encoding='utf-8')
 
 def location_landmark(kind: str) -> str:
     if kind == 'town':
@@ -269,27 +306,21 @@ def location_landmark(kind: str) -> str:
 def write_location(path: Path, lid: str, meta: tuple[str, str, str, str]) -> None:
     name, color, desc, kind = meta
     title = f'{name} · 古风武侠场景'
-    content = f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="{esc(title)}" data-art-direction="ancient-wuxia" data-kind="location" data-location-id="{esc(lid)}" data-theme="古风武侠江湖水墨场景">
+    content = f'''<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="{esc(title)}" data-art-direction="ancient-wuxia" data-kind="location" data-location-id="{esc(lid)}" data-theme="古风武侠江湖水墨场景">
   <title>{esc(title)}</title>
-  <desc>{esc(name)}古风武侠场景插画：{esc(desc)}。江湖水墨、卷轴纸纹、飞檐、山水留白与古风武侠氛围。</desc>
-{frame_defs(color)}
-  <rect width="640" height="360" rx="28" fill="#100b08"/>
-  <rect x="12" y="12" width="616" height="336" rx="22" fill="url(#paper)"/>
-  <rect x="12" y="12" width="616" height="336" rx="22" fill="url(#cloud)"/>
-  <rect x="12" y="12" width="616" height="336" rx="22" filter="url(#ink)"/>
-  <path d="M0 244c78-62 138-66 210-24 82 48 156 43 236-2 72-40 132-34 194 22v120H0z" fill="#050403" opacity=".28"/>
-  <path d="M38 158c78-64 150-84 242-56 76 23 132 14 214-38 40-25 72-30 108-15" fill="none" stroke="#fff1cd" stroke-width="7" stroke-linecap="round" opacity=".2"/>
-  <path d="M58 284c142-50 330-42 522-96" fill="none" stroke="#fff1cd" stroke-width="5" stroke-linecap="round" opacity=".2"/>
-  <g>{location_landmark(kind)}</g>
-  <rect x="34" y="254" width="256" height="70" rx="18" fill="#080504" opacity=".72"/>
-  <text x="162" y="298" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="31" font-weight="700" fill="#fff1ca">{esc(name)}</text>
-  <text x="486" y="314" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="20" fill="#f2d18f" opacity=".88">古风武侠 · 江湖水墨</text>
-  <rect x="12" y="12" width="616" height="336" rx="22" fill="url(#halo)"/>
-  <rect x="12" y="12" width="616" height="336" rx="22" fill="none" stroke="#f1d99f" stroke-width="3" opacity=".76"/>
+  <desc>{esc(name)}古风武侠小场景插画：{esc(desc)}。江湖水墨、卷轴纸纹、飞檐、山水留白与古风武侠氛围。</desc>
+  <defs><linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.52" stop-color="{color}"/><stop offset="1" stop-color="#100b09"/></linearGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#100b08"/>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="url(#paper)"/>
+  <path d="M0 98c18-16 30-15 46-6 17 10 30 10 48 0 12-7 20-7 26 2v66H0z" fill="#050403" opacity=".28"/>
+  <g transform="translate(0 5) scale(.19 .25)">{location_landmark(kind)}</g>
+  <rect x="10" y="112" width="100" height="28" rx="7" fill="#080504" opacity=".72"/>
+  <text x="60" y="130" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="12" font-weight="700" fill="#fff1ca">{esc(name)}</text>
+  <text x="60" y="145" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="6" fill="#f2d18f" opacity=".88">古风武侠 · 江湖水墨</text>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="none" stroke="#f1d99f" stroke-width="1.5" opacity=".76"/>
 </svg>
 '''
     path.write_text(content, encoding='utf-8')
-
 
 def main() -> None:
     active_paths = read_active_asset_paths()

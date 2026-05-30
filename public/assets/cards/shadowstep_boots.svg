@@ -1,25 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1008" viewBox="0 0 720 1008" role="img" aria-label="踏影靴 · 古风武侠装备卡牌" data-art-direction="ancient-wuxia" data-kind="card" data-card-id="shadowstep_boots" data-theme="古风武侠江湖水墨">
-  <title>踏影靴 · 古风武侠装备卡牌</title>
-  <desc>古风武侠江湖水墨装备卡牌插画：踏影靴，以卷轴纸纹、飞墨和器物剪影表现装备气韵。</desc>
-  <defs>
-    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.52" stop-color="#3d4f73"/><stop offset="1" stop-color="#100b09"/></linearGradient>
-    <radialGradient id="halo" cx="50%" cy="28%" r="62%"><stop stop-color="#f3dfb7" stop-opacity=".55"/><stop offset="1" stop-color="#050403" stop-opacity=".62"/></radialGradient>
-    <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="29"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .16"/></feComponentTransfer></filter>
-    <pattern id="cloud" width="96" height="44" patternUnits="userSpaceOnUse"><path d="M5 29c18-20 40-20 56 0 10-8 23-9 34 0" fill="none" stroke="#f3dfb7" stroke-width="2" opacity=".20"/></pattern>
-  </defs>
-  <rect width="720" height="1008" rx="48" fill="#120c08"/>
-  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#paper)"/>
-  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#cloud)"/>
-  <rect x="26" y="26" width="668" height="956" rx="38" filter="url(#ink)"/>
-  <path d="M0 555c92-80 154-78 236-25 76 49 143 55 235 6 93-50 157-45 249 34v438H0z" fill="#050403" opacity=".36"/>
-  <path d="M76 280c126-72 276-72 408-14 58 25 103 21 161-18" fill="none" stroke="#fff1cd" stroke-width="8" stroke-linecap="round" opacity=".20"/>
-  <path d="M96 678c140-72 360-38 526-116" fill="none" stroke="#fff1cd" stroke-width="6" stroke-linecap="round" opacity=".18"/>
-  <g transform="translate(360 375)"><path d="M-174 78c62 28 112 22 146-20 22 52 6 94-50 126-40 23-98 18-158-14 52-28 72-62 62-112z M18 82c58 25 112 19 152-22 17 54-3 96-58 126-42 23-92 15-146-12 48-27 66-58 52-92z" fill="#f5d99a" stroke="#fff5d8" stroke-width="6" stroke-linejoin="round" opacity=".92"/><circle cx="94" cy="-132" r="33" fill="#fff4d8" opacity=".35"/></g>
-  <rect x="68" y="712" width="584" height="196" rx="30" fill="#080504" opacity=".70"/>
-  <text x="360" y="780" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="58" font-weight="700" fill="#fff1ca">踏影靴</text>
-  <text x="360" y="836" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="28" fill="#f2d18f">轻履无声 · 夜行踏月</text>
-  <text x="360" y="882" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="22" fill="#ead8ad">EQUIPMENT · 江湖器物 · 古风武侠</text>
-  <text x="58" y="82" font-family="Georgia, serif" font-size="24" fill="#fff4d8" opacity=".84">装备</text>
-  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#halo)"/>
-  <rect x="26" y="26" width="668" height="956" rx="38" fill="none" stroke="#f1d99f" stroke-width="3" opacity=".76"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="踏影靴 · 古风武侠卡牌" data-art-direction="ancient-wuxia" data-kind="card" data-card-id="shadowstep_boots" data-theme="古风武侠江湖水墨">
+  <title>踏影靴 · 古风武侠卡牌</title>
+  <desc>古风武侠江湖水墨小卡插画：踏影靴对应招式为轻履无声 · 夜行踏影，以飞墨、剑气和卷轴纸纹表现招式气韵。</desc>
+  <defs><linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.55" stop-color="#4d4148"/><stop offset="1" stop-color="#100b09"/></linearGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#120c08"/>
+  <rect x="5" y="5" width="110" height="150" rx="8" fill="url(#paper)"/>
+  <path d="M0 92c18-16 32-14 48-5 16 10 28 10 46 0 12-7 20-7 26 2v71H0z" fill="#050403" opacity=".32"/>
+  <g transform="translate(60 63) scale(.16)"><circle r="132" fill="#f5d99a" stroke="#fff5d8" stroke-width="6" stroke-linejoin="round" opacity=".92"/><path d="M-115 0h230M0-115v230" stroke="#7b2d20" stroke-width="16" opacity=".5"/></g>
+  <rect x="10" y="112" width="100" height="28" rx="7" fill="#080504" opacity=".72"/>
+  <text x="60" y="129" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="12" font-weight="700" fill="#fff1ca">踏影靴</text>
+  <text x="60" y="145" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="6" fill="#ead8ad">equipment · 古风武侠</text>
+  <rect x="5" y="5" width="110" height="150" rx="8" fill="none" stroke="#f1d99f" stroke-width="1.5" opacity=".76"/>
 </svg>

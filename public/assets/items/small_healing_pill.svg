@@ -1,29 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 448" role="img" aria-labelledby="small-healing-pill-title small-healing-pill-desc" data-art-direction="ancient-wuxia-item" data-item-id="small_healing_pill">
-  <title id="small-healing-pill-title">小还丹</title>
-  <desc id="small-healing-pill-desc">医馆蜡封药丸小还丹，朱砂药匣中透出温润药气。</desc>
-  <defs>
-    <linearGradient id="small-healing-pill-bg" x1="38" y1="24" x2="282" y2="424" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#24120f"/>
-      <stop offset=".52" stop-color="#5a2420"/>
-      <stop offset="1" stop-color="#b64a36"/>
-    </linearGradient>
-    <radialGradient id="small-healing-pill-pill" cx="36%" cy="30%" r="72%">
-      <stop stop-color="#ffe6c4"/>
-      <stop offset=".45" stop-color="#d94736"/>
-      <stop offset="1" stop-color="#7b1f1f"/>
-    </radialGradient>
-  </defs>
-  <rect width="320" height="448" rx="30" fill="url(#small-healing-pill-bg)"/>
-  <rect x="24" y="24" width="272" height="400" rx="24" fill="none" stroke="#efd08a" stroke-width="5" opacity=".78"/>
-  <circle cx="160" cy="210" r="118" fill="#ffd5a0" opacity=".14"/>
-  <path d="M97 153 C113 127 207 127 223 153 L209 293 C182 315 138 315 111 293Z" fill="#5d2c1e" stroke="#2a1510" stroke-width="6"/>
-  <ellipse cx="160" cy="154" rx="63" ry="23" fill="#b77a41" stroke="#2a1510" stroke-width="5"/>
-  <path d="M113 177 C138 190 181 190 207 177" fill="none" stroke="#e1b36b" stroke-width="5" opacity=".65"/>
-  <circle cx="160" cy="225" r="55" fill="url(#small-healing-pill-pill)" stroke="#461619" stroke-width="6"/>
-  <circle cx="143" cy="205" r="12" fill="#fff0ce" opacity=".7"/>
-  <path d="M124 241 C140 258 179 258 196 240" fill="none" stroke="#ffbf80" stroke-width="6" stroke-linecap="round" opacity=".55"/>
-  <path d="M160 168 C147 140 175 119 160 92 M132 177 C113 151 130 132 112 109 M188 177 C207 151 190 132 208 109" fill="none" stroke="#ffe0bc" stroke-width="7" stroke-linecap="round" opacity=".35"/>
-  <path d="M78 323 C116 342 204 342 242 323" fill="none" stroke="#26130d" stroke-width="10" stroke-linecap="round" opacity=".25"/>
-  <text x="160" y="374" text-anchor="middle" font-size="34" font-family="serif" fill="#fff0c4">小还丹</text>
-  <text x="160" y="404" text-anchor="middle" font-size="18" font-family="serif" fill="#efd08a">蜡封疗伤药丸</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="160" viewBox="0 0 120 160" role="img" aria-label="小还丹 · 古风武侠道具" data-art-direction="ancient-wuxia-item" data-kind="item" data-item-id="small_healing_pill" data-theme="古风武侠江湖水墨道具">
+  <title>小还丹 · 古风武侠道具</title>
+  <desc>瓷瓶丹丸，江湖伤药，小尺寸古风武侠道具图标，适用于背包、厨艺与卡片展示。</desc>
+  <defs><radialGradient id="g" cx="50%" cy="36%" r="68%"><stop stop-color="#fff2d1"/><stop offset=".56" stop-color="#8f2e4b"/><stop offset="1" stop-color="#100805"/></radialGradient></defs>
+  <rect width="120" height="160" rx="10" fill="#120c08"/>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="url(#g)"/>
+  <path d="M24 106c20-17 50-20 74-4" stroke="#100805" stroke-width="8" stroke-linecap="round" fill="none" opacity=".28"/>
+  <circle cx="60" cy="66" r="28" fill="#fff2d1" opacity=".34"/>
+  <path d="M38 72c10-24 34-32 48-12 10 14 2 34-23 42-18-6-30-15-25-30z" fill="#100805" opacity=".36"/>
+  <text x="60" y="129" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="12" font-weight="700" fill="#fff1ca">小还丹</text>
+  <rect x="6" y="6" width="108" height="148" rx="8" fill="none" stroke="#f1d99f" stroke-width="1.5" opacity=".76"/>
 </svg>
