@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480" role="img" aria-label="铁衣苦行僧 · 铁衣僧 · 古风武侠人物" data-art-direction="ancient-wuxia" data-kind="enemy" data-theme="古风武侠江湖水墨人物">
+  <title>铁衣苦行僧 · 铁衣僧 · 古风武侠人物</title>
+  <desc>古风武侠人物，铁衣僧袍，铜杖护身。水墨山水背景、江湖侠客气质、古风衣冠、兵刃与武侠身姿。</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.52" stop-color="#706044"/><stop offset="1" stop-color="#100b09"/></linearGradient>
+    <radialGradient id="halo" cx="50%" cy="28%" r="62%"><stop stop-color="#f3dfb7" stop-opacity=".55"/><stop offset="1" stop-color="#050403" stop-opacity=".62"/></radialGradient>
+    <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="17"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .16"/></feComponentTransfer></filter>
+    <pattern id="cloud" width="96" height="44" patternUnits="userSpaceOnUse"><path d="M5 29c18-20 40-20 56 0 10-8 23-9 34 0" fill="none" stroke="#f3dfb7" stroke-width="2" opacity=".20"/></pattern>
+  </defs>
+  <rect width="360" height="480" rx="32" fill="#100b08"/>
+  <rect x="14" y="14" width="332" height="452" rx="26" fill="url(#paper)"/>
+  <rect x="14" y="14" width="332" height="452" rx="26" fill="url(#cloud)"/>
+  <rect x="14" y="14" width="332" height="452" rx="26" filter="url(#ink)"/>
+  <path d="M38 402c68-42 218-42 284 0" fill="none" stroke="#050403" stroke-width="24" opacity=".24"/>
+  <path d="M95 382c18-105 50-160 85-160s67 55 85 160z" fill="#706044" stroke="#f7e5bd" stroke-width="4" opacity=".96"/>
+  <path d="M114 315c44 24 88 24 132 0" fill="none" stroke="#fff3d6" stroke-width="6" opacity=".54"/>
+  <path d="M143 222h74l-18 42h-38z" fill="#e7c2a0" opacity=".94"/>
+  <circle cx="180" cy="150" r="56" fill="#efc29f"/>
+  <path d="M112 152c8-62 40-91 68-91s60 29 68 91c-31-24-105-24-136 0z" fill="#16100c"/>
+  <path d="M130 112c22-35 80-38 104 7-34-12-70-12-104-7z" fill="#050403" opacity=".82"/>
+  <path d="M149 158c8 8 17 8 25 0M187 158c8 8 17 8 25 0" stroke="#301610" stroke-width="4" stroke-linecap="round" fill="none" opacity=".82"/>
+  <path d="M168 190c9 7 18 7 27 0" stroke="#832c32" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M75 95l210 286" stroke="#fff2d1" stroke-width="5" opacity=".45"/>
+  <path d="M72 87l25 5-17 17z" fill="#fff2d1" opacity=".68"/>
+  <circle cx="286" cy="96" r="32" fill="#050403" opacity=".24"/>
+  <text x="286" y="107" text-anchor="middle" font-size="32" font-family="KaiTi, STKaiti, serif" fill="#fff1d1" opacity=".84">侠</text>
+  <rect x="38" y="402" width="284" height="42" rx="21" fill="#080504" opacity=".74"/>
+  <text x="180" y="427" text-anchor="middle" font-size="24" font-family="KaiTi, STKaiti, serif" fill="#fff1d6">铁衣苦行僧</text>
+  <text x="180" y="54" text-anchor="middle" font-size="19" font-family="KaiTi, STKaiti, serif" fill="#fff1d6" opacity=".88">铁衣僧</text>
+  <rect x="14" y="14" width="332" height="452" rx="26" fill="url(#halo)"/>
+  <rect x="14" y="14" width="332" height="452" rx="26" fill="none" stroke="#f1d9a7" stroke-width="3" opacity=".78"/>
+</svg>

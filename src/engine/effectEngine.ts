@@ -11,8 +11,13 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
     case 'remove_flag': next.flags = next.flags.filter((flag) => flag !== effect.value); return next
     case 'gain_silver': next.player.silver += effect.value; return next
     case 'gain_card': {
+      const card = cardById[effect.cardId]
+      if (card?.type === 'equipment') {
+        if (!next.equipmentBag.includes(effect.cardId)) next.equipmentBag.push(effect.cardId)
+        return next
+      }
       if (!next.deck.includes(effect.cardId)) next.deck.push(effect.cardId)
-      const source = cardById[effect.cardId]?.source
+      const source = card?.source
       const heroine = heroines.find((item) => item.id === source)
       if (heroine) {
         const unlockedCards = next.heroineStates[heroine.id].unlockedCards

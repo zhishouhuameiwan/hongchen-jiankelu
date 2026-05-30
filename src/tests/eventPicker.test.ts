@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pickEventForLocation } from '../engine/eventEngine'
+import { hasUnseenEventForLocation, pickEventForLocation } from '../engine/eventEngine'
 import { events } from '../data/events'
 import { makeState } from './helpers'
 
@@ -15,18 +15,15 @@ describe('pickEventForLocation', () => {
     expect(selected?.id).toBe('event_b')
   })
 
-  it('falls back to a simple clinic healing event when no special clinic event is available', () => {
+  it('throws when no event-bearing clinic card is available instead of falling back to ordinary travel', () => {
     const base = makeState()
     const state = { ...base, player: { ...base.player, stats: { ...base.player.stats, hp: 40 } } }
 
-    const selected = pickEventForLocation(state, [], 'clinic')
-
-    expect(selected?.id).toBe('ordinary_clinic_heal')
-    expect(selected?.title).toBe('医馆调息')
-    expect(selected?.choices[0].effects).toContainEqual({ type: 'heal', value: 10 })
+    expect(() => pickEventForLocation(state, [], 'clinic')).toThrow('No unseen event available for location: clinic')
+    expect(hasUnseenEventForLocation(state, [], 'clinic')).toBe(false)
   })
 
-  it('uses an ordinary event instead of repeating a seen special event', () => {
+  it('does not repeat a seen special event or replace it with ordinary travel', () => {
     const clinicEvent = events.find((event) => event.locationId === 'clinic')!
     const base = makeState()
     const state = {
@@ -35,8 +32,7 @@ describe('pickEventForLocation', () => {
       player: { ...base.player, stats: { ...base.player.stats, hp: 40 } },
     }
 
-    const selected = pickEventForLocation(state, [{ ...clinicEvent, requirements: [] }], 'clinic')
-
-    expect(selected?.id).toBe('ordinary_clinic_heal')
+    expect(() => pickEventForLocation(state, [{ ...clinicEvent, requirements: [] }], 'clinic')).toThrow('No unseen event available for location: clinic')
+    expect(hasUnseenEventForLocation(state, [{ ...clinicEvent, requirements: [] }], 'clinic')).toBe(false)
   })
 })

@@ -48,6 +48,22 @@ describe('gameStore exploration flow', () => {
     expect(state.log).toContain('夜色渐深，江湖暗流浮现。')
   })
 
+  it('does not spend travel stamina when a location no longer has an unseen event', () => {
+    const store = useGameStore.getState()
+    store.clearSavedGame()
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({ state: { ...state, flags: ['seen_town_bandit_notice_01', 'visited_weapon_stall'] }, setupScreen: 'menu' })
+
+    store.exploreLocation('town')
+
+    const next = useGameStore.getState().state!
+    expect(next.screen).toBe('map')
+    expect(next.stamina).toBe(state.stamina)
+    expect(next.currentLocationId).toBeUndefined()
+    expect(next.currentEventId).toBeUndefined()
+    expect(next.log.at(-1)).toBe('青石镇暂无可触发事件，先去别处看看。')
+  })
+
   it('keeps the hero on the map and records a hint when destination stamina is insufficient', () => {
     const store = useGameStore.getState()
     store.clearSavedGame()

@@ -16,6 +16,11 @@ export const cards: CardDefinition[] = [
   { id: 'clear_mind_powder', name: '清心散', type: 'romance', costInnerPower: 1, description: '清心定神，恢复内力。', effects: [{ type: 'gain_inner_power', amount: 2 }], source: 'bai_zhi' },
   { id: 'life_returning_needle', name: '回命十三针', type: 'romance', costInnerPower: 2, description: '恢复 16 点气血，获得 6 点格挡。', effects: [{ type: 'heal', amount: 16 }, { type: 'block', amount: 6 }], source: 'bai_zhi' },
   { id: 'blood_river_strike', name: '血河逆流', type: 'demonic', costInnerPower: 2, description: '造成 16 点伤害，魔心 +1。', effects: [{ type: 'damage', amount: 16 }, { type: 'gain_demon_heart', amount: 1 }], source: 'blood_river' },
+  { id: 'plain_iron_sword', name: '粗铁剑', type: 'equipment', costInnerPower: 0, description: '装备：攻击 +2。朴拙沉稳，适合初入江湖防身。', effects: [], source: 'equipment', equipmentSlot: 'weapon', bonuses: [{ stat: 'attack', value: 2 }] },
+  { id: 'cold_iron_blade', name: '寒铁刀', type: 'equipment', costInnerPower: 0, description: '装备：攻击 +3。刀身透寒，出鞘时似有霜声。', effects: [], source: 'equipment', equipmentSlot: 'weapon', bonuses: [{ stat: 'attack', value: 3 }] },
+  { id: 'woven_bamboo_armor', name: '编竹护甲', type: 'equipment', costInnerPower: 0, description: '装备：防御 +2。竹片以麻绳层层编缀，轻便却能卸力。', effects: [], source: 'equipment', equipmentSlot: 'armor', bonuses: [{ stat: 'defense', value: 2 }] },
+  { id: 'shadowstep_boots', name: '踏影靴', type: 'equipment', costInnerPower: 0, description: '装备：身法 +1。轻履无声，便于夜行脱身。', effects: [], source: 'equipment', equipmentSlot: 'boots', bonuses: [{ stat: 'agility', value: 1 }] },
+  { id: 'jade_peace_talisman', name: '平安玉符', type: 'equipment', costInnerPower: 0, description: '装备：气血上限 +6。温润旧玉贴身而佩，能稳住气血。', effects: [], source: 'equipment', equipmentSlot: 'accessory', bonuses: [{ stat: 'maxHp', value: 6 }] },
 ]
 
 export const starterDeck = ['basic_slash', 'basic_slash', 'basic_guard', 'basic_guard', 'basic_breath']

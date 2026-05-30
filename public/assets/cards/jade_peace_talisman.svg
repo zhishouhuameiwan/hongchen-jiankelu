@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 336" role="img" aria-labelledby="title desc">
+  <title id="title">平安玉符</title>
+  <desc id="desc">武侠装备卡牌插画：平安玉符</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#2b2118"/>
+      <stop offset="1" stop-color="#76d7c4"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="336" rx="24" fill="url(#bg)"/>
+  <rect x="18" y="18" width="204" height="300" rx="18" fill="none" stroke="#f4df9b" stroke-width="5"/>
+  <circle cx="120" cy="142" r="58" fill="#f7ead0" opacity="0.92"/>
+  <text x="120" y="164" text-anchor="middle" font-size="66" font-family="serif" fill="#1f7a66">符</text>
+  <path d="M62 230 C94 206 146 206 178 230" fill="none" stroke="#f4df9b" stroke-width="8" stroke-linecap="round"/>
+  <text x="120" y="284" text-anchor="middle" font-size="28" font-family="serif" fill="#fff4c2">平安玉符</text>
+</svg>

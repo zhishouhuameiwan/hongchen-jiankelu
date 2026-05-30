@@ -1,16 +1,19 @@
 import './index.css'
 import { cardById } from './data/cards'
+import { cardArtById } from './data/cardArt'
 import { endings } from './data/endings'
 import { events } from './data/events'
+import { locationArtById } from './data/locationArt'
 import { heroines, locations } from './data/world'
 import { enemyById } from './data/enemies'
 import { describeEnemyIntent } from './engine/combatEngine'
-import { pickEventForLocation } from './engine/eventEngine'
+import { pickSpecialEventForLocation } from './engine/eventEngine'
 import { useGameStore } from './store/gameStore'
 import { TopBar } from './components/TopBar'
 import { EventPage } from './components/EventPage'
 import { DeckPage } from './components/DeckPage'
 import { GoalPanel } from './components/GoalPanel'
+import { playerAvatarByBackgroundId, enemyArtById, heroineArtById, statusIconById } from './data/characterArt'
 
 const backgrounds = [
   { id: 'wandering_swordsman', name: '江湖浪客', text: '初始攻击 +1' },
@@ -27,14 +30,19 @@ function Menu() {
 
 function NewGame() {
   const start = useGameStore((s) => s.startNewGame)
-  return <main className="panel"><h2>选择出身</h2><div className="grid">{backgrounds.map((b) => <button className="card" key={b.id} onClick={() => start('无名侠客', b.id)}><b>{b.name}</b><small>{b.text}</small></button>)}</div></main>
+  return <main className="panel"><h2>选择出身</h2><div className="grid">{backgrounds.map((b) => <button className="card background-card" key={b.id} onClick={() => start('无名侠客', b.id)}><img className="portrait card-image background-portrait" src={playerAvatarByBackgroundId[b.id]} alt={`${b.name}头像`} /><b>{b.name}</b><small>{b.text}</small></button>)}</div></main>
 }
 
 function MapPage() {
   const state = useGameStore((s) => s.state)!
   const store = useGameStore()
-  const visibleLocations = locations.slice(0, 3)
-  return <main><TopBar /><nav><button onClick={() => store.go('heroine')}>红颜</button><button onClick={() => store.go('deck')}>卡组</button></nav><GoalPanel state={state} /><section className="grid">{visibleLocations.map((loc) => { const selected = pickEventForLocation(state, events, loc.id); const affordable = state.stamina >= loc.staminaCost; return <button className="card" key={loc.id} disabled={!affordable} onClick={() => store.exploreLocation(loc.id)}><h3>{loc.name}</h3><p>{state.phase === 'day' ? loc.dayDescription : loc.nightDescription}</p><small>路程体力 -{loc.staminaCost}</small><small>{selected ? `可触发：${selected.title}` : '暂无特殊事件'}</small>{!affordable ? <small>体力不足，先结束时段休整</small> : null}</button> })}</section><Log /></main>
+  const visibleLocations = locations.filter((loc) => pickSpecialEventForLocation(state, events, loc.id)).slice(0, 3)
+  return <main><TopBar /><nav><button onClick={() => store.go('heroine')}>红颜</button><button onClick={() => store.go('deck')}>卡组</button></nav><GoalPanel state={state} /><section className="grid">{visibleLocations.map((loc) => { const specialEvent = pickSpecialEventForLocation(state, events, loc.id); const affordable = state.stamina >= loc.staminaCost; return <button className="card location-card" key={loc.id} disabled={!affordable} onClick={() => store.exploreLocation(loc.id)}><img className="location-art card-image" src={locationArtById[loc.id]} alt={`${loc.name}场景`} /><h3>{loc.name}</h3><p>{state.phase === 'day' ? loc.dayDescription : loc.nightDescription}</p><small>路程体力 -{loc.staminaCost}</small><small>{specialEvent ? `可触发：${specialEvent.title}` : '暂无特殊事件'}</small>{!affordable ? <small>体力不足，先结束时段休整</small> : null}</button> })}</section><Log /></main>
+}
+
+function StatusList({ statuses, owner }: { statuses: { id: string; amount: number }[]; owner: string }) {
+  if (!statuses.length) return null
+  return <div className="status-row" aria-label={`${owner}状态`}>{statuses.map((status) => <span className="status-chip" key={`${owner}-${status.id}`}><img src={statusIconById[status.id]} alt={`${status.id}状态`} />{status.id} ×{status.amount}</span>)}</div>
 }
 
 function CombatPage() {
@@ -44,7 +52,7 @@ function CombatPage() {
   const enemy = enemyById[combat.enemyId]
   const intent = enemy.intents[(combat.turn - 1) % enemy.intents.length]
   const rewardCardNames = enemy.rewardCardPool.map((id) => cardById[id]?.name ?? id).join('、')
-  return <main><TopBar /><section className="panel"><h2>{enemy.name}</h2><p>敌人气血：{combat.enemyHp}/{enemy.maxHp} · 回合 {combat.turn}</p><p className="intent">敌人意图：{describeEnemyIntent(intent)}</p>{combat.result ? <div className="result-panel"><h3>{combat.result === 'victory' ? '胜利战果' : '败局后果'}</h3><p>{combat.result === 'victory' ? `可得：银两 +${enemy.rewardSilver}，卡牌候选：${rewardCardNames}` : '失去部分气血并退回地图，江湖不会等你。'}</p>{combat.result === 'victory' ? <div className="grid reward-cards">{enemy.rewardCardPool.map((id) => <button className="card" key={id} onClick={() => store.finishCombat(id)}>{cardById[id]?.name ?? id}</button>)}</div> : <button onClick={() => store.finishCombat()}>{'接受败局'}</button>}</div> : <><p className="hint">出招后会自动结算敌方行动，进入下一回合。</p><div className="grid">{combat.drawnCardIds.map((id, index) => { const card = cardById[id]; const lacksInnerPower = state.player.stats.innerPower < card.costInnerPower; return <button className="card" key={`${id}-${index}`} disabled={lacksInnerPower} onClick={() => store.playCard(id)}><b>{card.name}</b><small>内力 {card.costInnerPower}</small><small>{card.description}</small>{lacksInnerPower ? <small className="warning">内力不足</small> : null}</button> })}</div></>}<pre>{combat.log.slice(-8).join('\n')}</pre></section></main>
+  return <main><TopBar /><section className="panel combat-scene"><div className="combatants"><article className="combatant"><img className="portrait card-image" src={playerAvatarByBackgroundId[state.player.backgroundId]} alt={`${state.playerName}头像`} /><b>{state.playerName}</b><StatusList statuses={combat.playerStatuses} owner="玩家" /></article><article className="combatant enemy"><img className="portrait card-image" src={enemyArtById[enemy.id]} alt={`${enemy.name}画像`} /><b>{enemy.name}</b><span>气血 {combat.enemyHp}/{enemy.maxHp}</span><StatusList statuses={combat.enemyStatuses} owner="敌人" /></article></div><h2>{enemy.name}</h2><p>敌人气血：{combat.enemyHp}/{enemy.maxHp} · 回合 {combat.turn}</p><p className="intent">敌人意图：{describeEnemyIntent(intent)}</p>{combat.result ? <div className="result-panel"><h3>{combat.result === 'victory' ? '胜利战果' : '败局后果'}</h3><p>{combat.result === 'victory' ? `可得：银两 +${enemy.rewardSilver}，卡牌候选：${rewardCardNames}` : '失去部分气血并退回地图，江湖不会等你。'}</p>{combat.result === 'victory' ? <div className="grid reward-cards">{enemy.rewardCardPool.map((id) => <button className="card deck-card" key={id} onClick={() => store.finishCombat(id)}>{cardById[id]?.name ?? id}</button>)}</div> : <button onClick={() => store.finishCombat()}>{'接受败局'}</button>}</div> : <><p className="hint">出招后会自动结算敌方行动，进入下一回合。</p><div className="grid">{combat.drawnCardIds.map((id, index) => { const card = cardById[id]; const lacksInnerPower = state.player.stats.innerPower < card.costInnerPower; return <button className="card combat-card" key={`${id}-${index}`} disabled={lacksInnerPower} onClick={() => store.playCard(id)}><img className="card-art card-image" src={cardArtById[id]} alt={`${card.name}插画`} /><b>{card.name}</b><small>内力 {card.costInnerPower}</small><small>{card.description}</small>{lacksInnerPower ? <small className="warning">内力不足</small> : null}</button> })}</div></>}<pre>{combat.log.slice(-8).join('\n')}</pre></section></main>
 }
 
 function HeroinePage() {
@@ -54,12 +62,16 @@ function HeroinePage() {
     const s = state.heroineStates[h.id]
     const isChosen = state.flags.includes(`route_locked_${h.id}`)
     const unlockedCardNames = s.unlockedCards.map((id) => cardById[id]?.name ?? id)
-    return <article className={`card ${s.locked ? 'locked' : isChosen ? 'chosen' : ''}`} key={h.id}><h2>{h.name}</h2><b>{h.title} · {h.faction}</b><p>{h.description}</p><p>好感 {s.affection} · 信念 {s.belief} · 阶段 {s.routeStage}</p><p className="route-status">{s.locked ? '缘线已错过' : isChosen ? '已定缘线' : '缘线未定'}</p><small>机制：{h.mechanicName}</small><small>{unlockedCardNames.length ? `已解锁：${unlockedCardNames.join('、')}` : '尚未解锁专属卡牌'}</small></article>
+    return <article className={`card heroine-card ${s.locked ? 'locked' : isChosen ? 'chosen' : ''}`} key={h.id}><img className="portrait card-image heroine-portrait" src={heroineArtById[h.id]} alt={`${h.name}立绘`} /><h2>{h.name}</h2><b>{h.title} · {h.faction}</b><p>{h.description}</p><p>好感 {s.affection} · 信念 {s.belief} · 阶段 {s.routeStage}</p><p className="route-status">{s.locked ? '缘线已错过' : isChosen ? '已定缘线' : '缘线未定'}</p><small>机制：{h.mechanicName}</small><small>{unlockedCardNames.length ? `已解锁：${unlockedCardNames.join('、')}` : '尚未解锁专属卡牌'}</small></article>
   })}</section></main>
 }
 
 function EndingPage() { const state = useGameStore((s) => s.state)!; const clear = useGameStore((s) => s.clearSavedGame); const ending = endings.find((e) => e.id === state.endingId) ?? endings.at(-1)!; return <main className="hero"><h1>{ending.title}</h1><p>{ending.text}</p><p>名声 {state.player.stats.reputation} · 魔心 {state.player.stats.demonHeart}</p><button onClick={clear}>返回主菜单</button></main> }
-function Log() { const state = useGameStore((s) => s.state)!; return <pre className="log">{state.log.slice(-6).join('\n')}</pre> }
+function Log() {
+  const state = useGameStore((s) => s.state)!
+  const latestCardGain = [...state.log].reverse().find((entry) => entry.startsWith('新卡入库：'))
+  return <><pre className="log">{state.log.slice(-6).join('\n')}</pre>{latestCardGain ? <div className="card-gain-toast" role="status"><b>{latestCardGain.split('。')[0]}</b><small>去卡组查看。</small></div> : null}</>
+}
 
 export default function App() {
   const state = useGameStore((s) => s.state)

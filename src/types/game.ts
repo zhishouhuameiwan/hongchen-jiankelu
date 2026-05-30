@@ -33,6 +33,7 @@ export type Requirement =
   | { type: 'day_min'; value: number }
   | { type: 'day_max'; value: number }
   | { type: 'stamina_min'; value: number }
+  | { type: 'silver_min'; value: number }
   | { type: 'heroine_affection_min'; heroine: HeroineId; value: number }
   | { type: 'heroine_belief_min'; heroine: HeroineId; value: number }
   | { type: 'heroine_stage'; heroine: HeroineId; value: number }
@@ -59,7 +60,9 @@ export type Effect =
 export type Choice = { id: string; text: string; staminaCost: number; requirements?: Requirement[]; effects: Effect[] }
 export type GameEvent = { id: string; title: string; phase: Phase | 'any'; locationId: LocationId; weight: number; requirements: Requirement[]; text: string; choices: Choice[] }
 
-export type CardType = 'attack' | 'defense' | 'inner' | 'movement' | 'trick' | 'romance' | 'demonic'
+export type EquipmentSlot = 'weapon' | 'armor' | 'boots' | 'accessory'
+export type EquipmentBonus = { stat: Exclude<StatKey, 'silver'>; value: number }
+export type CardType = 'attack' | 'defense' | 'inner' | 'movement' | 'trick' | 'romance' | 'demonic' | 'equipment'
 export type CardEffect =
   | { type: 'damage'; amount: number }
   | { type: 'block'; amount: number }
@@ -68,7 +71,7 @@ export type CardEffect =
   | { type: 'apply_status'; status: string; amount: number }
   | { type: 'draw'; amount: number }
   | { type: 'gain_demon_heart'; amount: number }
-export type CardDefinition = { id: string; name: string; type: CardType; costInnerPower: number; description: string; effects: CardEffect[]; source: string }
+export type CardDefinition = { id: string; name: string; type: CardType; costInnerPower: number; description: string; effects: CardEffect[]; source: string; equipmentSlot?: EquipmentSlot; bonuses?: EquipmentBonus[] }
 
 export type EnemyIntent = { type: 'attack'; amount: number } | { type: 'guard'; amount: number } | { type: 'apply_status'; status: string; amount: number }
 export type EnemyDefinition = { id: string; name: string; maxHp: number; attack: number; defense: number; intents: EnemyIntent[]; rewardCardPool: string[]; rewardSilver: number }
@@ -84,6 +87,8 @@ export type GameState = {
   playerName: string
   player: { stats: PlayerStats; silver: number; backgroundId: string }
   deck: string[]
+  equipment: Partial<Record<EquipmentSlot, string>>
+  equipmentBag: string[]
   flags: string[]
   heroineStates: Record<HeroineId, HeroineState>
   currentLocationId?: LocationId

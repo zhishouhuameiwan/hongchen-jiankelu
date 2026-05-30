@@ -1,73 +1,51 @@
-# React + TypeScript + Vite
+# 红尘剑客录
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+个人开发者可维护的武侠卡牌叙事原型。玩家在 30 日内探索白天/夜晚地点、处理江湖事件、构筑战斗卡组，并在三条红颜缘线与《血河经》主线之间做出最终选择。
 
-Currently, two official plugins are available:
+## 当前玩法闭环
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **地图探索**：每次地图只显示 3 个地点卡，点击“换一批地点”轮换到其余地点，避免一次性铺满信息。
+- **昼夜与体力**：前往地点和事件选项都会消耗体力；体力耗尽会自动推进到夜晚或次日。
+- **事件系统**：地点根据阶段、旗标、天数和红颜关系触发特殊事件；没有特殊事件时由普通事件兜底。
+- **战斗卡牌**：事件可进入战斗，玩家用内力打出攻击、防御、身法、红颜专属和魔功卡牌；胜利后选择战利品卡。
+- **成长路径**：黑松林可获得铁布衫、血河逆流、寒潭运功等成长；剑派/医馆/黑市分别服务不同缘线。
+- **红颜缘线**：沈青霜、洛红绫、白芷各有阶段推进、专属卡牌、锁线状态和好结局条件。
+- **终局目标**：第 25 日后血河异动加剧，玩家可封印、治愈、夜奔或修炼血河经，并进入不同结局。
 
-## React Compiler
+## 视觉方向
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **基调**：暗色宣纸、茶楼灯火、旧铜边框与金色标题，突出“江湖夜雨 + 残卷秘闻”。
+- **布局**：主界面保持卡牌网格，核心信息上方固定展示；地图强制 3 张地点卡，符合轻量原型节奏。
+- **卡牌美术**：`public/assets/cards/` 中使用确定性 SVG 占位插画，`src/data/cardArt.ts` 统一维护卡牌到图片路径的映射。
+- **信息反馈**：事件选项显示体力与收益预览，战斗页显示敌人意图，红颜页显示缘线锁定与已解锁专属卡。
 
-## Expanding the ESLint configuration
+## 开发命令
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm test
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+开发预览：
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+## 推荐的个人开发迭代顺序
+
+1. **先扩事件，不先扩系统**：每轮只新增 1~2 个地点事件，用现有 `Effect` 组合验证趣味。
+2. **每条缘线保持 3 段结构**：初遇、锁线、终局；避免剧情树爆炸。
+3. **卡牌数量小步增长**：每新增一张卡，补一条战斗或内容测试，确认来源、费用与效果。
+4. **终局提前可见**：第 25 日压力提示要一直存在，让玩家知道时间限制。
+5. **保留普通事件兜底**：任何地点即使没有特殊事件，也应让玩家能回血、赚钱或换取小收益。
+
+## 关键文件
+
+- `src/data/events.ts`：主线、地点、红颜与成长事件。
+- `src/data/cards.ts`：战斗卡牌定义。
+- `src/data/endings.ts`：结局优先级与条件。
+- `src/data/world.ts`：地点、红颜与最大天数。
+- `src/engine/*`：条件判断、事件应用、战斗、昼夜推进、结局选择。
+- `src/tests/*`：玩法与 UI 回归测试。

@@ -41,6 +41,15 @@ describe('combat and growth content loop', () => {
     expect(nonStarterGrowthCards).toEqual(expect.arrayContaining(['cloud_step', 'iron_cloth', 'blood_river_strike']))
   })
 
+  it('offers a risky inner power training event before late-game card costs spike', () => {
+    const event = events.find((candidate) => candidate.id === 'forest_inner_power_trial_01')
+
+    expect(event).toBeDefined()
+    expect(event?.locationId).toBe('forest')
+    expect(event?.choices.some((choice) => choice.effects.some((effect) => effect.type === 'increase_max_stamina'))).toBe(true)
+    expect(event?.choices.some((choice) => choice.effects.some((effect) => effect.type === 'stat' && effect.stat === 'maxInnerPower'))).toBe(true)
+  })
+
   it('offers more than baseline combat encounters through events', () => {
     const combatEnemyIds = new Set(events.flatMap((event) => event.choices.flatMap((choice) => choice.effects.filter((effect) => effect.type === 'start_combat').map((effect) => effect.enemyId))))
 

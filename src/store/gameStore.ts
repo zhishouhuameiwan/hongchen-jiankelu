@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { starterDeck } from '../data/cards'
-import type { Choice, GameState, LocationId } from '../types/game'
+import type { Choice, EquipmentSlot, GameState, LocationId } from '../types/game'
 import { applyChoice } from '../engine/eventEngine'
 import { advancePhase } from '../engine/dayPhaseEngine'
 import { clearSave, hasSavedGame, loadGame, saveGame } from '../engine/saveEngine'
@@ -10,8 +10,9 @@ import { events } from '../data/events'
 import { enemyById } from '../data/enemies'
 import { cardById } from '../data/cards'
 import { endPlayerTurn, playCombatCard } from '../engine/combatEngine'
-import { pickEventForLocation } from '../engine/eventEngine'
+import { hasUnseenEventForLocation, pickEventForLocation } from '../engine/eventEngine'
 import { locationById } from '../data/world'
+import { equipEquipmentCard, unequipEquipmentCard } from '../engine/equipmentEngine'
 
 export type GameStore = {
   state: GameState | null
@@ -28,6 +29,8 @@ export type GameStore = {
   chooseEventChoice: (choice: Choice) => void
   advancePhase: () => void
   playCard: (cardId: string) => void
+  equipCard: (cardId: string) => void
+  unequipSlot: (slot: EquipmentSlot) => void
   endTurn: () => void
   finishCombat: (rewardCardId?: string) => void
 }
@@ -36,7 +39,7 @@ export function createInitialGameState(name: string, backgroundId: string): Game
   return {
     screen: 'map', day: 1, phase: 'day', stamina: 6, maxStamina: 6, playerName: name || '无名侠客',
     player: { backgroundId, silver: backgroundId === 'fallen_noble' ? 40 : 20, stats: { hp: backgroundId === 'medicine_apprentice' ? 70 : 60, maxHp: backgroundId === 'medicine_apprentice' ? 70 : 60, innerPower: 3, maxInnerPower: 3, attack: backgroundId === 'wandering_swordsman' ? 6 : 5, defense: 2, agility: backgroundId === 'street_survivor' ? 3 : 2, mind: 5, reputation: backgroundId === 'street_survivor' ? -1 : 0, demonHeart: 0 } },
-    deck: [...starterDeck], flags: [],
+    deck: [...starterDeck], equipment: {}, equipmentBag: [], flags: [],
     heroineStates: {
       shen_qingshuang: { id: 'shen_qingshuang', affection: 0, belief: 0, routeStage: 0, locked: false, unlockedCards: [] },
       luo_hongling: { id: 'luo_hongling', affection: 0, belief: 0, routeStage: 0, locked: false, unlockedCards: [] },
@@ -65,6 +68,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       set({ state: persist({ ...state, log: [...state.log, `体力不足，无法前往${location.name}。`] }) })
       return
     }
+    if (!hasUnseenEventForLocation(state, events, locationId)) {
+      set({ state: persist({ ...state, log: [...state.log, `${location.name}暂无可触发事件，先去别处看看。`] }) })
+      return
+    }
     const event = pickEventForLocation(state, events, locationId)
     const afterTravel = { ...state, stamina: state.stamina - location.staminaCost, currentLocationId: locationId, currentEventId: event?.id, screen: event ? 'event' as const : 'map' as const }
     set({ state: persist(afterTravel.stamina === 0 ? advancePhase(afterTravel) : afterTravel) })
@@ -90,13 +97,17 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const shouldAutoEndTurn = !state.currentCombat.actionTaken && afterCard.currentCombat?.actionTaken && !afterCard.currentCombat.result
     set({ state: persist(shouldAutoEndTurn ? endPlayerTurn(afterCard, enemy) : afterCard) })
   },
+  equipCard: (cardId) => { const state = get().state; if (state) set({ state: persist(equipEquipmentCard(state, cardId)) }) },
+  unequipSlot: (slot) => { const state = get().state; if (state) set({ state: persist(unequipEquipmentCard(state, slot)) }) },
   endTurn: () => { const state = get().state; if (!state?.currentCombat || state.currentCombat.result) return; set({ state: persist(endPlayerTurn(state, enemyById[state.currentCombat.enemyId])) }) },
   finishCombat: (rewardCardId) => {
     const state = get().state; if (!state?.currentCombat) return
     if (state.currentCombat.result === 'victory') {
       const enemy = enemyById[state.currentCombat.enemyId]
       const rewardCard = rewardCardId ?? enemy.rewardCardPool[0]
-      const next = { ...state, screen: 'map' as const, currentCombat: undefined, currentEventId: undefined, currentLocationId: undefined, deck: state.deck.includes(rewardCard) ? state.deck : [...state.deck, rewardCard], player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, `战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`] }
+      const gainedNewCard = !state.deck.includes(rewardCard)
+      const gainLogs = [`战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`, ...(gainedNewCard ? [`新卡入库：${cardById[rewardCard]?.name ?? rewardCard}。去卡组查看。`] : [])]
+      const next = { ...state, screen: 'map' as const, currentCombat: undefined, currentEventId: undefined, currentLocationId: undefined, deck: gainedNewCard ? [...state.deck, rewardCard] : state.deck, player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, ...gainLogs] }
       set({ state: persist(advancePhase(next)) })
     } else {
       const ending = chooseEnding({ ...state, player: { ...state.player, stats: { ...state.player.stats, hp: 0 } } }, endings)

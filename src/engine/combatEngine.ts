@@ -1,4 +1,5 @@
 import type { CardDefinition, EnemyDefinition, EnemyIntent, GameState } from '../types/game'
+import { getEquippedStatBonus } from './equipmentEngine'
 
 export function drawCardIds(deck: string[], amount: number): string[] {
   if (deck.length <= amount) return deck
@@ -16,7 +17,7 @@ export function describeEnemyIntent(intent: EnemyIntent): string {
 }
 
 export function playCombatCard(state: GameState, card: CardDefinition): GameState {
-  let next: GameState = structuredClone(state)
+  const next: GameState = structuredClone(state)
   const combat = next.currentCombat
   if (!combat) return next
   if (combat.actionTaken) { combat.log.push('本回合已行动。'); return next }
@@ -24,8 +25,8 @@ export function playCombatCard(state: GameState, card: CardDefinition): GameStat
   next.player.stats.innerPower -= card.costInnerPower
   combat.actionTaken = true
   for (const effect of card.effects) {
-    if (effect.type === 'damage') { const damage = Math.max(0, effect.amount - combat.enemyBlock); combat.enemyHp = Math.max(0, combat.enemyHp - damage); combat.log.push(`${card.name} 造成 ${damage} 点伤害。`) }
-    if (effect.type === 'block') { combat.playerBlock += effect.amount; combat.log.push(`${card.name} 获得 ${effect.amount} 点格挡。`) }
+    if (effect.type === 'damage') { const damage = Math.max(0, effect.amount + getEquippedStatBonus(next, 'attack') - combat.enemyBlock); combat.enemyHp = Math.max(0, combat.enemyHp - damage); combat.log.push(`${card.name} 造成 ${damage} 点伤害。`) }
+    if (effect.type === 'block') { const block = effect.amount + getEquippedStatBonus(next, 'defense'); combat.playerBlock += block; combat.log.push(`${card.name} 获得 ${block} 点格挡。`) }
     if (effect.type === 'heal') { next.player.stats.hp = Math.min(next.player.stats.maxHp, next.player.stats.hp + effect.amount); combat.log.push(`${card.name} 恢复 ${effect.amount} 点气血。`) }
     if (effect.type === 'gain_inner_power') { next.player.stats.innerPower = Math.min(next.player.stats.maxInnerPower, next.player.stats.innerPower + effect.amount); combat.log.push(`${card.name} 恢复 ${effect.amount} 点内力。`) }
     if (effect.type === 'apply_status') { combat.enemyStatuses.push({ id: effect.status, amount: effect.amount }); combat.log.push(`${card.name} 施加 ${effect.status}。`) }
@@ -36,7 +37,7 @@ export function playCombatCard(state: GameState, card: CardDefinition): GameStat
 }
 
 export function endPlayerTurn(state: GameState, enemy: EnemyDefinition): GameState {
-  let next = resolveEnemyTurn(state, enemy)
+  const next = resolveEnemyTurn(state, enemy)
   if (!next.currentCombat) return next
   if (next.player.stats.hp <= 0) { next.currentCombat.result = 'defeat'; next.currentCombat.log.push('你败下阵来。'); return next }
   next.currentCombat.turn += 1
@@ -52,7 +53,7 @@ export function resolveEnemyTurn(state: GameState, enemy: EnemyDefinition): Game
   const combat = next.currentCombat
   if (!combat) return next
   const intent = enemy.intents[(combat.turn - 1) % enemy.intents.length]
-  if (intent.type === 'attack') { const damage = Math.max(0, intent.amount - combat.playerBlock); next.player.stats.hp = Math.max(0, next.player.stats.hp - damage); combat.log.push(`${enemy.name} 攻击，造成 ${damage} 点伤害。`) }
+  if (intent.type === 'attack') { const damage = Math.max(0, intent.amount - combat.playerBlock - getEquippedStatBonus(next, 'defense')); next.player.stats.hp = Math.max(0, next.player.stats.hp - damage); combat.log.push(`${enemy.name} 攻击，造成 ${damage} 点伤害。`) }
   if (intent.type === 'guard') { combat.enemyBlock += intent.amount; combat.log.push(`${enemy.name} 转为守势。`) }
   if (intent.type === 'apply_status') { combat.playerStatuses.push({ id: intent.status, amount: intent.amount }); combat.log.push(`${enemy.name} 施加 ${intent.status}。`) }
   return next

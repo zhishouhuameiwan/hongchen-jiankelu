@@ -1,5 +1,6 @@
 import { useGameStore } from '../store/gameStore'
 import { heroines } from '../data/world'
+import { playerAvatarByBackgroundId } from '../data/characterArt'
 
 export function TopBar() {
   const state = useGameStore((s) => s.state)!
@@ -7,6 +8,7 @@ export function TopBar() {
 
   return (
     <div className="topbar">
+      <img className="avatar tiny-avatar" src={playerAvatarByBackgroundId[state.player.backgroundId]} alt={`${state.playerName}头像`} />
       <b>第 {state.day}/30 日 · {state.phase === 'day' ? '白天' : '夜晚'}</b>
       <span>体力 {state.stamina}/{state.maxStamina}</span>
       <span>气血 {state.player.stats.hp}/{state.player.stats.maxHp}</span>

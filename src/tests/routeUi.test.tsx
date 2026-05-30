@@ -39,6 +39,49 @@ describe('route UI presentation', () => {
     expect(screen.queryByRole('button', { name: /百草医馆/ })).not.toBeInTheDocument()
   })
 
+  it('hides location cards that have no unseen event left instead of spending stamina on empty travel', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        screen: 'map',
+        flags: [
+          'seen_town_bandit_notice_01',
+          'visited_weapon_stall',
+          'seen_teahouse_blood_river_rumor_01',
+          'seen_teahouse_blood_river_investigation_02',
+          'seen_forest_inner_power_trial_01',
+          'seen_forest_mad_warrior_01',
+          'seen_forest_iron_body_trial_01',
+        ],
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+
+    expect(screen.getAllByRole('button', { name: /路程体力/ })).toHaveLength(2)
+    expect(screen.queryByRole('button', { name: /青石镇/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /听雨茶楼/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /黑松林/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /百草医馆/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /青霜剑派别院/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /破庙黑市/ })).not.toBeInTheDocument()
+  })
+
+  it('does not add hot/cold or manual cycling logic to the location deck', () => {
+    useGameStore.setState({ state: createInitialGameState('测试侠客', 'wandering_swordsman'), setupScreen: 'menu' })
+
+    render(<App />)
+
+    expect(screen.queryByRole('button', { name: '换一批地点' })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /路程体力/ })).toHaveLength(3)
+    expect(screen.getByRole('button', { name: /青石镇/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /听雨茶楼/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /黑松林/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /百草医馆/ })).not.toBeInTheDocument()
+  })
+
   it('shows current goals on the map based on story progress', () => {
     const early = createInitialGameState('测试侠客', 'wandering_swordsman')
     useGameStore.setState({ state: { ...early, screen: 'map' }, setupScreen: 'menu' })
@@ -178,6 +221,36 @@ describe('route UI presentation', () => {
     expect(screen.getByText(/山道劫匪 攻击，造成 6 点伤害。/)).toBeInTheDocument()
   })
 
+  it('shows player avatar, enemy portrait, and status icons during combat', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        screen: 'combat',
+        currentCombat: {
+          enemyId: 'black_market_master',
+          enemyHp: 60,
+          playerBlock: 0,
+          enemyBlock: 0,
+          turn: 1,
+          drawnCardIds: ['basic_slash'],
+          playerStatuses: [{ id: 'poison', amount: 3 }],
+          enemyStatuses: [{ id: 'sealed', amount: 2 }],
+          log: ['黑市高手 拦住了你的去路。'],
+          actionTaken: false,
+        },
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+
+    expect(screen.getAllByAltText('测试侠客头像')[0]).toHaveAttribute('src', '/assets/figures/players/wandering_swordsman.svg')
+    expect(screen.getByAltText('黑市高手画像')).toHaveAttribute('src', '/assets/figures/enemies/black_market_master.svg')
+    expect(screen.getByAltText('poison状态')).toHaveAttribute('src', '/assets/statuses/poison.svg')
+    expect(screen.getByAltText('sealed状态')).toHaveAttribute('src', '/assets/statuses/sealed.svg')
+  })
+
   it('disables combat cards when inner power is insufficient and explains why', () => {
     const state = createInitialGameState('测试侠客', 'wandering_swordsman')
     useGameStore.setState({
@@ -209,6 +282,17 @@ describe('route UI presentation', () => {
     expect(card).toHaveTextContent('内力 2')
     expect(card).toHaveTextContent('内力不足')
     expect(card).toBeDisabled()
+  })
+
+  it('shows heroine portraits on the relationship page', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({ state: { ...state, screen: 'heroine' }, setupScreen: 'menu' })
+
+    render(<App />)
+
+    expect(screen.getByAltText('沈青霜立绘')).toHaveAttribute('src', '/assets/figures/heroines/shen_qingshuang.svg')
+    expect(screen.getByAltText('洛红绫立绘')).toHaveAttribute('src', '/assets/figures/heroines/luo_hongling.svg')
+    expect(screen.getByAltText('白芷立绘')).toHaveAttribute('src', '/assets/figures/heroines/bai_zhi.svg')
   })
 
   it('shows battle result stakes before finishing combat', () => {
@@ -271,7 +355,8 @@ describe('route UI presentation', () => {
     expect(next.screen).toBe('map')
     expect(next.deck).toContain('basic_guard')
     expect(next.player.silver).toBe(state.player.silver + 8)
-    expect(next.log.at(-2)).toBe('战斗胜利，获得 8 两与 横剑格挡。')
+    expect(next.log.at(-3)).toBe('战斗胜利，获得 8 两与 横剑格挡。')
+    expect(next.log.at(-2)).toBe('新卡入库：横剑格挡。去卡组查看。')
   })
 
   it('shows defeat consequences before accepting combat defeat', () => {
@@ -329,7 +414,7 @@ describe('route UI presentation', () => {
     expect(screen.getByText('敌人意图：攻击 6')).toBeInTheDocument()
   })
 
-  it('groups deck cards and highlights heroine-exclusive cards', () => {
+  it('groups deck cards and highlights heroine-exclusive cards with compact sizing', () => {
     const state = createInitialGameState('测试侠客', 'wandering_swordsman')
     useGameStore.setState({
       state: {
@@ -344,8 +429,9 @@ describe('route UI presentation', () => {
 
     expect(screen.getByRole('heading', { name: '基础武学' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '红颜专属' })).toBeInTheDocument()
+    expect(screen.getByText('劈风斩').closest('article')).toHaveClass('deck-card--compact')
     expect(screen.getByText('青霜一剑').closest('article')).toHaveTextContent('红颜专属')
-    expect(screen.getByText('并肩御敌').closest('article')).toHaveClass('heroine-card')
+    expect(screen.getByText('并肩御敌').closest('article')).toHaveClass('heroine-card', 'deck-card--mini')
   })
 
   it('shows the locked heroine route in the top bar', () => {
@@ -380,27 +466,83 @@ describe('route UI presentation', () => {
     expect(screen.getByText('终局将近：血河经异动加剧')).toBeInTheDocument()
   })
 
-  it('shows locked route status and heroine reward cards on heroine page', () => {
+  it('uses shared card/image sizing classes for map, deck, combat, and heroine cards', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({ state: { ...state, screen: 'map' }, setupScreen: 'menu' })
+
+    const { rerender } = render(<App />)
+
+    expect(screen.getByRole('button', { name: /青石镇/ })).toHaveClass('card', 'location-card')
+
+    useGameStore.setState({ state: { ...state, screen: 'deck', deck: ['basic_slash'] }, setupScreen: 'menu' })
+    rerender(<App />)
+    expect(screen.getByText('劈风斩').closest('article')).toHaveClass('card', 'deck-card', 'deck-card--compact')
+    expect(screen.getByAltText('劈风斩插画')).toHaveClass('card-art', 'card-image')
+
+    useGameStore.setState({
+      state: {
+        ...state,
+        screen: 'combat',
+        currentCombat: {
+          enemyId: 'bandit',
+          enemyHp: 28,
+          playerBlock: 0,
+          enemyBlock: 0,
+          turn: 1,
+          drawnCardIds: ['basic_slash'],
+          playerStatuses: [],
+          enemyStatuses: [],
+          log: ['山道劫匪 拦住了你的去路。'],
+        },
+      },
+      setupScreen: 'menu',
+    })
+    rerender(<App />)
+    expect(screen.getByRole('button', { name: /劈风斩/ })).toHaveClass('card', 'combat-card')
+    expect(screen.getByAltText('劈风斩插画')).toHaveClass('card-art', 'card-image')
+    expect(screen.getAllByAltText('测试侠客头像').some((image) => image.classList.contains('portrait') && image.classList.contains('card-image'))).toBe(true)
+
+    useGameStore.setState({ state: { ...state, screen: 'heroine' }, setupScreen: 'menu' })
+    rerender(<App />)
+    expect(screen.getByText('沈青霜').closest('article')).toHaveClass('card', 'heroine-card')
+    expect(screen.getByAltText('沈青霜立绘')).toHaveClass('portrait', 'card-image')
+  })
+
+  it('shows an animated hint after a new card is added', () => {
     const state = createInitialGameState('测试侠客', 'wandering_swordsman')
     useGameStore.setState({
       state: {
         ...state,
-        screen: 'heroine',
-        flags: ['route_locked_shen_qingshuang'],
-        heroineStates: {
-          ...state.heroineStates,
-          shen_qingshuang: { ...state.heroineStates.shen_qingshuang, affection: 30, belief: 22, routeStage: 2, unlockedCards: ['qingshuang_sword', 'stand_together'] },
-          luo_hongling: { ...state.heroineStates.luo_hongling, locked: true },
-          bai_zhi: { ...state.heroineStates.bai_zhi, locked: true },
-        },
+        screen: 'map',
+        log: [...state.log, '新卡入库：横剑格挡。去卡组查看。'],
       },
       setupScreen: 'menu',
     })
 
     render(<App />)
 
-    expect(screen.getByText('已定缘线')).toBeInTheDocument()
-    expect(screen.getAllByText('缘线已错过')).toHaveLength(2)
-    expect(screen.getByText('已解锁：青霜一剑、并肩御敌')).toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveClass('card-gain-toast')
+    expect(screen.getByText('新卡入库：横剑格挡')).toBeInTheDocument()
+    expect(screen.getByText('去卡组查看。')).toBeInTheDocument()
+  })
+
+  it('hides location cards whose special events have all dissipated', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        flags: ['seen_town_bandit_notice_01', 'visited_weapon_stall'],
+        screen: 'map',
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+
+    expect(screen.queryByRole('button', { name: /青石镇/ })).not.toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /路程体力/ })).toHaveLength(3)
+    expect(screen.getByRole('button', { name: /听雨茶楼/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /黑松林/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /百草医馆/ })).toBeInTheDocument()
   })
 })

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1008" viewBox="0 0 720 1008" role="img" aria-label="红莲蚀骨 · 古风武侠卡牌" data-art-direction="ancient-wuxia" data-kind="card" data-card-id="red_lotus_poison" data-theme="古风武侠江湖水墨">
+  <title>红莲蚀骨 · 古风武侠卡牌</title>
+  <desc>古风武侠江湖水墨卡牌插画：红莲蚀骨对应招式为红莲暗香 · 毒入骨髓，以山水留白、飞墨、剑气和卷轴纸纹表现招式气韵。</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.52" stop-color="#9b2436"/><stop offset="1" stop-color="#100b09"/></linearGradient>
+    <radialGradient id="halo" cx="50%" cy="28%" r="62%"><stop stop-color="#f3dfb7" stop-opacity=".55"/><stop offset="1" stop-color="#050403" stop-opacity=".62"/></radialGradient>
+    <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="17"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .16"/></feComponentTransfer></filter>
+    <pattern id="cloud" width="96" height="44" patternUnits="userSpaceOnUse"><path d="M5 29c18-20 40-20 56 0 10-8 23-9 34 0" fill="none" stroke="#f3dfb7" stroke-width="2" opacity=".20"/></pattern>
+  </defs>
+  <rect width="720" height="1008" rx="48" fill="#120c08"/>
+  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#paper)"/>
+  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#cloud)"/>
+  <rect x="26" y="26" width="668" height="956" rx="38" filter="url(#ink)"/>
+  <path d="M0 555c92-80 154-78 236-25 76 49 143 55 235 6 93-50 157-45 249 34v438H0z" fill="#050403" opacity=".36"/>
+  <path d="M76 280c126-72 276-72 408-14 58 25 103 21 161-18" fill="none" stroke="#fff1cd" stroke-width="8" stroke-linecap="round" opacity=".20"/>
+  <path d="M96 678c140-72 360-38 526-116" fill="none" stroke="#fff1cd" stroke-width="6" stroke-linecap="round" opacity=".18"/>
+  <g transform="translate(360 375)"><path d="M0-150c48 62 50 114 0 178-50-64-48-116 0-178z" fill="#f5d99a" stroke="#fff5d8" stroke-width="6" stroke-linejoin="round" opacity=".92"/><path d="M-88-92c64 29 91 80 72 153-70-33-94-82-72-153z" fill="#f5d99a" stroke="#fff5d8" stroke-width="6" stroke-linejoin="round" opacity=".92"/><path d="M88-92c-64 29-91 80-72 153 70-33 94-82 72-153z" fill="#f5d99a" stroke="#fff5d8" stroke-width="6" stroke-linejoin="round" opacity=".92"/><path d="M-150 50c98 8 198 8 300 0" fill="none" stroke="#fff5d8" stroke-width="12" opacity=".45"/></g>
+  <rect x="68" y="712" width="584" height="196" rx="30" fill="#080504" opacity=".70"/>
+  <text x="360" y="780" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="58" font-weight="700" fill="#fff1ca">红莲蚀骨</text>
+  <text x="360" y="836" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="28" fill="#f2d18f">红莲暗香 · 毒入骨髓</text>
+  <text x="360" y="882" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="22" fill="#ead8ad">TRICK · luo_hongling · 古风武侠</text>
+  <text x="58" y="82" font-family="Georgia, serif" font-size="24" fill="#fff4d8" opacity=".84">江湖</text>
+  <rect x="26" y="26" width="668" height="956" rx="38" fill="url(#halo)"/>
+  <rect x="26" y="26" width="668" height="956" rx="38" fill="none" stroke="#f1d99f" stroke-width="3" opacity=".76"/>
+</svg>

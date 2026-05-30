@@ -36,7 +36,7 @@ export function EventPage() {
         <p>{event.text}</p>
         {!hasAvailableChoice ? (
           <div className="event-blocked">
-            <p>你已无力继续处理此事，先退回地图休整吧。</p>
+            <p>你当前不满足任何选项条件，先退回地图准备更多体力、银两或前置进展吧。</p>
             <button onClick={() => go('map')}>返回地图</button>
           </div>
         ) : null}

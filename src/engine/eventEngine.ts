@@ -3,7 +3,6 @@ import { checkRequirements } from './conditionEngine'
 import { applyEffects } from './effectEngine'
 import { spendStamina } from './dayPhaseEngine'
 import { describeChoiceEffects } from './rewardSummaryEngine'
-import { ordinaryEvents } from '../data/ordinaryEvents'
 
 export function getAvailableEvents(state: GameState, events: GameEvent[], locationId: string): GameEvent[] {
   return events.filter((event) => event.locationId === locationId && (event.phase === 'any' || event.phase === state.phase) && checkRequirements(state, event.requirements)).sort((a, b) => b.weight - a.weight)
@@ -11,8 +10,16 @@ export function getAvailableEvents(state: GameState, events: GameEvent[], locati
 
 export function pickEventForLocation(state: GameState, events: GameEvent[], locationId: LocationId): GameEvent {
   const unseenSpecialEvents = getAvailableEvents(state, events, locationId).filter((event) => !state.flags.includes(`seen_${event.id}`))
-  if (unseenSpecialEvents.length === 0) return ordinaryEvents[locationId]
+  if (unseenSpecialEvents.length === 0) throw new Error(`No unseen event available for location: ${locationId}`)
   return unseenSpecialEvents[0]
+}
+
+export function hasUnseenEventForLocation(state: GameState, events: GameEvent[], locationId: LocationId): boolean {
+  return pickSpecialEventForLocation(state, events, locationId) !== undefined
+}
+
+export function pickSpecialEventForLocation(state: GameState, events: GameEvent[], locationId: LocationId): GameEvent | undefined {
+  return getAvailableEvents(state, events, locationId).find((event) => !state.flags.includes(`seen_${event.id}`))
 }
 
 export function canChooseChoice(state: GameState, choice: Choice): boolean {

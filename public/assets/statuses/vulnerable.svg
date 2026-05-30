@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="易伤状态图标" data-art-direction="ancient-wuxia" data-kind="status" data-theme="古风武侠状态">
+  <title>易伤 · 古风武侠状态</title>
+  <desc>裂甲破绽，古风武侠江湖水墨符印状态图标。</desc>
+  <defs><radialGradient id="g" cx="50%" cy="38%" r="62%"><stop stop-color="#fff2d1"/><stop offset=".52" stop-color="#c07a36"/><stop offset="1" stop-color="#100805"/></radialGradient></defs>
+  <circle cx="64" cy="64" r="58" fill="url(#g)"/>
+  <circle cx="64" cy="64" r="50" fill="none" stroke="#fff0c8" stroke-width="4" opacity=".72"/>
+  <path d="M30 70c20-26 46-26 68 0M45 42c10 16 28 16 38 0M64 26v76" fill="none" stroke="#100805" stroke-width="8" stroke-linecap="round" opacity=".58"/>
+  <text x="64" y="75" text-anchor="middle" font-family="KaiTi, STKaiti, serif" font-size="30" fill="#fff4d8">易</text>
+</svg>
