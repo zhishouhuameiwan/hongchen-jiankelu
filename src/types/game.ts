@@ -45,6 +45,7 @@ export type Effect =
   | { type: 'remove_flag'; value: string }
   | { type: 'gain_silver'; value: number }
   | { type: 'gain_card'; cardId: string }
+  | { type: 'gain_item'; itemId: string; amount?: number }
   | { type: 'heal'; value: number }
   | { type: 'damage'; value: number }
   | { type: 'stat'; stat: StatKey; value: number }
@@ -59,6 +60,13 @@ export type Effect =
 
 export type Choice = { id: string; text: string; staminaCost: number; requirements?: Requirement[]; effects: Effect[] }
 export type GameEvent = { id: string; title: string; phase: Phase | 'any'; locationId: LocationId; weight: number; requirements: Requirement[]; text: string; choices: Choice[] }
+
+export type ItemEffect =
+  | { type: 'heal'; value: number }
+  | { type: 'restore_stamina'; value: number }
+  | { type: 'restore_inner_power'; value: number }
+
+export type ItemDefinition = { id: string; name: string; category: 'consumable' | 'quest'; description: string; effects: ItemEffect[]; source: string }
 
 export type EquipmentSlot = 'weapon' | 'armor' | 'boots' | 'accessory'
 export type EquipmentBonus = { stat: Exclude<StatKey, 'silver'>; value: number }
@@ -89,6 +97,7 @@ export type GameState = {
   deck: string[]
   equipment: Partial<Record<EquipmentSlot, string>>
   equipmentBag: string[]
+  itemBag: Record<string, number>
   flags: string[]
   heroineStates: Record<HeroineId, HeroineState>
   currentLocationId?: LocationId

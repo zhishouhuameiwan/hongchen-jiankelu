@@ -355,8 +355,10 @@ describe('route UI presentation', () => {
     expect(next.screen).toBe('map')
     expect(next.deck).toContain('basic_guard')
     expect(next.player.silver).toBe(state.player.silver + 8)
-    expect(next.log.at(-3)).toBe('战斗胜利，获得 8 两与 横剑格挡。')
-    expect(next.log.at(-2)).toBe('新卡入库：横剑格挡。去卡组查看。')
+    expect(next.log).toContain('战斗胜利，获得 8 两与 横剑格挡。')
+    expect(next.log).toContain('新卡入库：横剑格挡。去卡组查看。')
+    expect(next.log).toContain('获得物品：小还丹。')
+    expect(next.itemBag.small_healing_pill).toBe(1)
   })
 
   it('shows defeat consequences before accepting combat defeat', () => {

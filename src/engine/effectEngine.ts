@@ -2,6 +2,7 @@ import type { Effect, GameState } from '../types/game'
 import { startCombat } from './combatEngine'
 import { enemyById } from '../data/enemies'
 import { cardById } from '../data/cards'
+import { itemById } from '../data/items'
 import { heroines } from '../data/world'
 
 export function applyEffect(state: GameState, effect: Effect): GameState {
@@ -23,6 +24,13 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
         const unlockedCards = next.heroineStates[heroine.id].unlockedCards
         if (!unlockedCards.includes(effect.cardId)) unlockedCards.push(effect.cardId)
       }
+      return next
+    }
+    case 'gain_item': {
+      if (!itemById[effect.itemId]) return next
+      const amount = effect.amount ?? 1
+      if (amount <= 0) return next
+      next.itemBag[effect.itemId] = (next.itemBag[effect.itemId] ?? 0) + amount
       return next
     }
     case 'heal': next.player.stats.hp = Math.min(next.player.stats.maxHp, next.player.stats.hp + effect.value); return next

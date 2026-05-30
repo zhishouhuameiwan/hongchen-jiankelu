@@ -11,7 +11,7 @@ export const events: GameEvent[] = [
   ] },
   { id: 'town_bandit_notice_01', title: '镖局悬赏', phase: 'day', locationId: 'town', weight: 20, requirements: [], text: '镖局贴出悬赏：黑松林劫匪近日频繁出没。', choices: [
     { id: 'accept', text: '接下悬赏', staminaCost: 2, effects: [{ type: 'start_combat', enemyId: 'bandit' }] },
-    { id: 'work', text: '帮忙搬运货物', staminaCost: 1, effects: [{ type: 'gain_silver', value: 6 }] },
+    { id: 'work', text: '帮忙搬运货物', staminaCost: 1, effects: [{ type: 'gain_silver', value: 6 }, { type: 'gain_item', itemId: 'dry_ration' }] },
   ] },
   { id: 'town_weapon_stall_01', title: '街口兵器摊', phase: 'day', locationId: 'town', weight: 34, requirements: [{ type: 'flag_missing', value: 'visited_weapon_stall' }], text: '镇口铁匠支起兵器摊，粗铁剑、寒铁刀、编竹护甲、踏影靴与平安玉符并排摆着，价钱写在木牌上。', choices: [
     { id: 'buy_sword', text: '买下粗铁剑（12 两）', staminaCost: 1, requirements: [{ type: 'silver_min', value: 12 }], effects: [{ type: 'gain_silver', value: -12 }, { type: 'gain_card', cardId: 'plain_iron_sword' }, { type: 'set_flag', value: 'visited_weapon_stall' }] },
@@ -54,11 +54,11 @@ export const events: GameEvent[] = [
   ] },
   { id: 'clinic_baizhi_intro_01', title: '银针灯火', phase: 'day', locationId: 'clinic', weight: 90, requirements: [{ type: 'heroine_stage', heroine: 'bai_zhi', value: 0 }, { type: 'flag_missing', value: 'route_locked_shen_qingshuang' }, { type: 'flag_missing', value: 'route_locked_luo_hongling' }], text: '白芷正在救治一名走火入魔者。她手很稳，眼神却藏着疲惫。', choices: [
     { id: 'assist', text: '帮她按住病人', staminaCost: 1, effects: [{ type: 'heroine_affection', heroine: 'bai_zhi', value: 10 }, { type: 'heroine_belief', heroine: 'bai_zhi', value: 10 }, { type: 'heroine_stage', heroine: 'bai_zhi', value: 1 }, { type: 'gain_card', cardId: 'silver_needle' }] },
-    { id: 'heal', text: '请她疗伤', staminaCost: 1, effects: [{ type: 'heal', value: 12 }, { type: 'heroine_affection', heroine: 'bai_zhi', value: 4 }] },
+    { id: 'heal', text: '请她疗伤', staminaCost: 1, effects: [{ type: 'heal', value: 12 }, { type: 'gain_item', itemId: 'small_healing_pill' }, { type: 'heroine_affection', heroine: 'bai_zhi', value: 4 }] },
   ] },
   { id: 'clinic_baizhi_route_02', title: '药香问心', phase: 'day', locationId: 'clinic', weight: 132, requirements: [{ type: 'heroine_stage', heroine: 'bai_zhi', value: 1 }, { type: 'heroine_affection_min', heroine: 'bai_zhi', value: 10 }, { type: 'flag_missing', value: 'route_locked_shen_qingshuang' }, { type: 'flag_missing', value: 'route_locked_luo_hongling' }], text: '白芷把脉后沉默许久。她说血河经不是武学，而是一种会传染人心的病。', choices: [
     { id: 'study', text: '帮她整理医案', staminaCost: 2, effects: [{ type: 'heroine_affection', heroine: 'bai_zhi', value: 14 }, { type: 'heroine_belief', heroine: 'bai_zhi', value: 12 }, { type: 'heroine_stage', heroine: 'bai_zhi', value: 2 }, { type: 'lock_route', heroine: 'bai_zhi' }, { type: 'gain_card', cardId: 'clear_mind_powder' }] },
-    { id: 'medicine', text: '购买清心药材', staminaCost: 1, effects: [{ type: 'gain_silver', value: -8 }, { type: 'heal', value: 18 }, { type: 'heroine_affection', heroine: 'bai_zhi', value: 4 }] },
+    { id: 'medicine', text: '购买清心药材', staminaCost: 1, effects: [{ type: 'gain_silver', value: -8 }, { type: 'heal', value: 18 }, { type: 'gain_item', itemId: 'qi_recovery_powder' }, { type: 'heroine_affection', heroine: 'bai_zhi', value: 4 }] },
   ] },
   { id: 'clinic_baizhi_route_03', title: '药谷解方', phase: 'day', locationId: 'clinic', weight: 188, requirements: [{ type: 'heroine_stage', heroine: 'bai_zhi', value: 2 }, { type: 'heroine_affection_min', heroine: 'bai_zhi', value: 24 }, { type: 'heroine_belief_min', heroine: 'bai_zhi', value: 20 }, { type: 'flag', value: 'blood_river_clue' }, { type: 'flag', value: 'route_locked_bai_zhi' }], text: '白芷终于写出解方，但需要有人以内力引毒。她看着你，第一次露出害怕失去的神情。', choices: [
     { id: 'cure', text: '以内力试药', staminaCost: 2, effects: [{ type: 'heroine_affection', heroine: 'bai_zhi', value: 10 }, { type: 'set_flag', value: 'blood_river_cured' }, { type: 'gain_card', cardId: 'life_returning_needle' }, { type: 'stat', stat: 'mind', value: 2 }, { type: 'heroine_stage', heroine: 'bai_zhi', value: 3 }] },
@@ -78,7 +78,7 @@ export const events: GameEvent[] = [
   ] },
   { id: 'ruined_temple_blood_altar_01', title: '血坛夜鸣', phase: 'night', locationId: 'ruined_temple', weight: 260, requirements: [{ type: 'day_min', value: 25 }, { type: 'flag', value: 'blood_river_fragment_found' }, { type: 'flag_missing', value: 'blood_altar_disrupted' }], text: '破庙深处，残页墨痕与地上血纹遥相呼应。血河经似乎不再只是传闻，它正在借人心苏醒。', choices: [
     { id: 'disrupt', text: '斩碎血坛引出幕后傀儡', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'start_combat', enemyId: 'blood_river_puppet' }] },
-    { id: 'read', text: '冒险默记血纹逆流法', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'gain_card', cardId: 'blood_river_strike' }, { type: 'stat', stat: 'demonHeart', value: 2 }] },
+    { id: 'read', text: '冒险默记血纹逆流法', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'gain_card', cardId: 'blood_river_strike' }, { type: 'gain_item', itemId: 'blood_jade_fragment' }, { type: 'stat', stat: 'demonHeart', value: 2 }] },
   ] },
   { id: 'main_final_choice', title: '最终抉择', phase: 'any', locationId: 'teahouse', weight: 1000, requirements: [{ type: 'day_min', value: 25 }, { type: 'flag', value: 'blood_river_clue' }], text: '三十日将近，《血河经》完整残卷就在眼前。你必须选择它的归宿。', choices: [
     { id: 'seal', text: '与沈青霜封印血河经', staminaCost: 1, effects: [{ type: 'set_flag', value: 'blood_river_sealed' }, { type: 'stat', stat: 'reputation', value: 5 }, { type: 'end_game', endingId: 'righteous_rising' }] },

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { starterDeck } from '../data/cards'
 import type { Choice, EquipmentSlot, GameState, LocationId } from '../types/game'
 import { applyChoice } from '../engine/eventEngine'
+import { useItem } from '../engine/itemEngine'
 import { advancePhase } from '../engine/dayPhaseEngine'
 import { clearSave, hasSavedGame, loadGame, saveGame } from '../engine/saveEngine'
 import { chooseEnding } from '../engine/endingEngine'
@@ -31,6 +32,7 @@ export type GameStore = {
   playCard: (cardId: string) => void
   equipCard: (cardId: string) => void
   unequipSlot: (slot: EquipmentSlot) => void
+  useItem: (itemId: string) => void
   endTurn: () => void
   finishCombat: (rewardCardId?: string) => void
 }
@@ -39,7 +41,7 @@ export function createInitialGameState(name: string, backgroundId: string): Game
   return {
     screen: 'map', day: 1, phase: 'day', stamina: 6, maxStamina: 6, playerName: name || '无名侠客',
     player: { backgroundId, silver: backgroundId === 'fallen_noble' ? 40 : 20, stats: { hp: backgroundId === 'medicine_apprentice' ? 70 : 60, maxHp: backgroundId === 'medicine_apprentice' ? 70 : 60, innerPower: 3, maxInnerPower: 3, attack: backgroundId === 'wandering_swordsman' ? 6 : 5, defense: 2, agility: backgroundId === 'street_survivor' ? 3 : 2, mind: 5, reputation: backgroundId === 'street_survivor' ? -1 : 0, demonHeart: 0 } },
-    deck: [...starterDeck], equipment: {}, equipmentBag: [], flags: [],
+    deck: [...starterDeck], equipment: {}, equipmentBag: [], itemBag: {}, flags: [],
     heroineStates: {
       shen_qingshuang: { id: 'shen_qingshuang', affection: 0, belief: 0, routeStage: 0, locked: false, unlockedCards: [] },
       luo_hongling: { id: 'luo_hongling', affection: 0, belief: 0, routeStage: 0, locked: false, unlockedCards: [] },
@@ -99,6 +101,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   equipCard: (cardId) => { const state = get().state; if (state) set({ state: persist(equipEquipmentCard(state, cardId)) }) },
   unequipSlot: (slot) => { const state = get().state; if (state) set({ state: persist(unequipEquipmentCard(state, slot)) }) },
+  useItem: (itemId) => { const state = get().state; if (state) set({ state: persist(useItem(state, itemId)) }) },
   endTurn: () => { const state = get().state; if (!state?.currentCombat || state.currentCombat.result) return; set({ state: persist(endPlayerTurn(state, enemyById[state.currentCombat.enemyId])) }) },
   finishCombat: (rewardCardId) => {
     const state = get().state; if (!state?.currentCombat) return
@@ -106,8 +109,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const enemy = enemyById[state.currentCombat.enemyId]
       const rewardCard = rewardCardId ?? enemy.rewardCardPool[0]
       const gainedNewCard = !state.deck.includes(rewardCard)
-      const gainLogs = [`战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`, ...(gainedNewCard ? [`新卡入库：${cardById[rewardCard]?.name ?? rewardCard}。去卡组查看。`] : [])]
-      const next = { ...state, screen: 'map' as const, currentCombat: undefined, currentEventId: undefined, currentLocationId: undefined, deck: gainedNewCard ? [...state.deck, rewardCard] : state.deck, player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, ...gainLogs] }
+      const gainLogs = [`战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`, ...(gainedNewCard ? [`新卡入库：${cardById[rewardCard]?.name ?? rewardCard}。去卡组查看。`] : []), '获得物品：小还丹。']
+      const next = { ...state, screen: 'map' as const, currentCombat: undefined, currentEventId: undefined, currentLocationId: undefined, deck: gainedNewCard ? [...state.deck, rewardCard] : state.deck, itemBag: { ...state.itemBag, small_healing_pill: (state.itemBag.small_healing_pill ?? 0) + 1 }, player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, ...gainLogs] }
       set({ state: persist(advancePhase(next)) })
     } else {
       const ending = chooseEnding({ ...state, player: { ...state.player, stats: { ...state.player.stats, hp: 0 } } }, endings)

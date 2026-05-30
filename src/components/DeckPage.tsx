@@ -1,5 +1,7 @@
 import { cards, cardById } from '../data/cards'
 import { cardArtById } from '../data/cardArt'
+import { itemById } from '../data/items'
+import { itemArtById } from '../data/itemArt'
 import { equipmentSlotLabels, getEquipmentBonusText } from '../engine/equipmentEngine'
 import { useGameStore } from '../store/gameStore'
 import { TopBar } from './TopBar'
@@ -16,6 +18,7 @@ export function DeckPage() {
   const go = useGameStore((s) => s.go)
   const equipCard = useGameStore((s) => s.equipCard)
   const unequipSlot = useGameStore((s) => s.unequipSlot)
+  const useBagItem = useGameStore((s) => s.useItem)
   const groupedDeck = state.deck.reduce<Record<string, string[]>>((groups, id) => {
     const label = getDeckGroupLabel(cardById[id].source)
     groups[label] = [...(groups[label] ?? []), id]
@@ -26,10 +29,34 @@ export function DeckPage() {
     ...Object.values(state.equipment).filter((id): id is string => Boolean(id)),
   ]))
 
+  const itemEntries = Object.entries(state.itemBag).filter(([, count]) => count > 0)
+
   return (
     <main>
       <TopBar />
       <button onClick={() => go('map')}>返回地图</button>
+      <section className="deck-group item-panel">
+        <h2>物品</h2>
+        <p className="menu-hint">消耗品可在行囊中使用；任务物品会保留为后续剧情线索。</p>
+        {itemEntries.length ? (
+          <div className="grid equipment-bag" aria-label="物品行囊">
+            {itemEntries.map(([id, count]) => {
+              const item = itemById[id]
+              if (!item) return null
+              const usable = item.category === 'consumable' && item.effects.length > 0
+              return (
+                <article className="card deck-card deck-card--compact item-card" key={id}>
+                  <img className="card-art card-image" src={itemArtById[id]} alt={`${item.name}插画`} />
+                  <h3>{item.name} ×{count}</h3>
+                  <p>{item.description}</p>
+                  <small>{item.category === 'consumable' ? '消耗品' : '任务物品'} · {item.source}</small>
+                  {usable ? <button onClick={() => useBagItem(id)}>使用{item.name}</button> : <button disabled>不可使用</button>}
+                </article>
+              )
+            })}
+          </div>
+        ) : <p className="menu-hint">暂无物品。可从医馆、镇集或江湖事件获得。</p>}
+      </section>
       <section className="deck-group equipment-panel">
         <h2>装备</h2>
         <p className="menu-hint">装备卡不会进入战斗抽牌；同槽位新装备会替换旧装备，属性加成即时生效。</p>
