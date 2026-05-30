@@ -90,7 +90,8 @@ export type CardDefinition = { id: string; name: string; type: CardType; costInn
 export type EnemyIntent = { type: 'attack'; amount: number } | { type: 'guard'; amount: number } | { type: 'apply_status'; status: string; amount: number }
 export type EnemyDefinition = { id: string; name: string; maxHp: number; attack: number; defense: number; intents: EnemyIntent[]; rewardCardPool: string[]; rewardSilver: number }
 export type CombatStatus = { id: string; amount: number }
-export type CombatState = { enemyId: string; enemyHp: number; playerBlock: number; enemyBlock: number; turn: number; drawnCardIds: string[]; playerStatuses: CombatStatus[]; enemyStatuses: CombatStatus[]; log: string[]; actionTaken?: boolean; result?: 'victory' | 'defeat' }
+export type CombatMoment = { type: 'enemy_hit' | 'player_hit' | 'poison' | 'heal' | 'guard' | 'status'; text: string }
+export type CombatState = { enemyId: string; enemyHp: number; playerBlock: number; enemyBlock: number; turn: number; drawnCardIds: string[]; playerStatuses: CombatStatus[]; enemyStatuses: CombatStatus[]; log: string[]; lastMoment?: CombatMoment; actionTaken?: boolean; result?: 'victory' | 'defeat' }
 
 export type GameState = {
   screen: Screen

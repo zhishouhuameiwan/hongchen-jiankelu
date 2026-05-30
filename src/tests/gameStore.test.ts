@@ -45,7 +45,7 @@ describe('gameStore exploration flow', () => {
     expect(state.stamina).toBe(Math.ceil(state.maxStamina / 2))
     expect(state.currentLocationId).toBeUndefined()
     expect(state.currentEventId).toBeUndefined()
-    expect(state.log).toContain('夜色渐深，江湖暗流浮现。')
+    expect(state.log).toEqual(expect.arrayContaining([expect.stringContaining('夜色渐深，江湖暗流浮现。')]))
   })
 
   it('does not spend travel stamina when a location no longer has an unseen event', () => {
@@ -113,7 +113,7 @@ describe('gameStore event feedback', () => {
     const state = useGameStore.getState().state!
     expect(state.phase).toBe('night')
     expect(state.stamina).toBe(3)
-    expect(state.log).toContain('夜色渐深，江湖暗流浮现。')
+    expect(state.log).toEqual(expect.arrayContaining([expect.stringContaining('夜色渐深，江湖暗流浮现。')]))
   })
 
   it('records a readable reward summary after choosing an event option', () => {

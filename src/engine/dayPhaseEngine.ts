@@ -11,12 +11,14 @@ export function spendStamina(state: GameState, amount: number): GameState {
 export function advancePhase(state: GameState): GameState {
   if (state.phase === 'day') {
     const recoveredStamina = Math.min(state.maxStamina, state.stamina + Math.ceil(state.maxStamina / 2))
-    return { ...state, screen: 'map', phase: 'night', stamina: recoveredStamina, currentEventId: undefined, currentLocationId: undefined, log: [...state.log, '夜色渐深，江湖暗流浮现。'] }
+    const recoveredAmount = recoveredStamina - state.stamina
+    return { ...state, screen: 'map', phase: 'night', stamina: recoveredStamina, currentEventId: undefined, currentLocationId: undefined, log: [...state.log, `夜色渐深，江湖暗流浮现。体力恢复 ${recoveredAmount} 点（${state.stamina}→${recoveredStamina}）。`] }
   }
   const nextDay = state.day + 1
   if (nextDay > maxDays) {
     const ending = chooseEnding(state, endings)
     return { ...state, endingId: ending.id, screen: 'ending', log: [...state.log, '三十日已尽，江湖给出了答案。'] }
   }
-  return { ...state, day: nextDay, phase: 'day', stamina: state.maxStamina, player: { ...state.player, stats: { ...state.player.stats, innerPower: state.player.stats.maxInnerPower } }, currentEventId: undefined, currentLocationId: undefined, log: [...state.log, `第 ${nextDay} 天，晨光照入窗棂。`] }
+  const recoveredAmount = state.maxStamina - state.stamina
+  return { ...state, day: nextDay, phase: 'day', stamina: state.maxStamina, player: { ...state.player, stats: { ...state.player.stats, innerPower: state.player.stats.maxInnerPower } }, currentEventId: undefined, currentLocationId: undefined, log: [...state.log, `第 ${nextDay} 天，晨光照入窗棂。体力恢复 ${recoveredAmount} 点（${state.stamina}→${state.maxStamina}），内力已回满。`] }
 }

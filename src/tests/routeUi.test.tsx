@@ -221,6 +221,35 @@ describe('route UI presentation', () => {
     expect(screen.getByText(/山道劫匪 攻击，造成 6 点伤害。/)).toBeInTheDocument()
   })
 
+  it('shows the latest combat moment as an action cue', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        screen: 'combat',
+        currentCombat: {
+          enemyId: 'black_market_master',
+          enemyHp: 48,
+          playerBlock: 0,
+          enemyBlock: 0,
+          turn: 2,
+          drawnCardIds: ['red_lotus_poison'],
+          playerStatuses: [],
+          enemyStatuses: [{ id: 'poison', amount: 4 }],
+          log: ['红莲蚀骨 施加 poison。'],
+          actionTaken: true,
+          lastMoment: { type: 'poison', text: '黑市高手身中中毒 4 层。' },
+        },
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+
+    expect(screen.getByRole('status', { name: '战斗表现' })).toHaveTextContent('黑市高手身中中毒 4 层。')
+    expect(screen.getByRole('status', { name: '战斗表现' })).toHaveClass('combat-moment--poison')
+  })
+
   it('shows player avatar, enemy portrait, and status icons during combat', () => {
     const state = createInitialGameState('测试侠客', 'wandering_swordsman')
     useGameStore.setState({

@@ -13,6 +13,7 @@ import { TopBar } from './components/TopBar'
 import { EventPage } from './components/EventPage'
 import { DeckPage } from './components/DeckPage'
 import { GoalPanel } from './components/GoalPanel'
+import type { GameState } from './types/game'
 import { playerAvatarByBackgroundId, enemyArtById, heroineArtById, statusIconById } from './data/characterArt'
 
 const backgrounds = [
@@ -45,6 +46,11 @@ function StatusList({ statuses, owner }: { statuses: { id: string; amount: numbe
   return <div className="status-row" aria-label={`${owner}状态`}>{statuses.map((status) => <span className="status-chip" key={`${owner}-${status.id}`}><img src={statusIconById[status.id]} alt={`${status.id}状态`} />{status.id} ×{status.amount}</span>)}</div>
 }
 
+function CombatMomentCue({ combat }: { combat: NonNullable<GameState['currentCombat']> }) {
+  if (!combat.lastMoment) return null
+  return <div role="status" aria-label="战斗表现" className={`combat-moment combat-moment--${combat.lastMoment.type}`}>{combat.lastMoment.text}</div>
+}
+
 function CombatPage() {
   const state = useGameStore((s) => s.state)!
   const store = useGameStore()
@@ -52,7 +58,7 @@ function CombatPage() {
   const enemy = enemyById[combat.enemyId]
   const intent = enemy.intents[(combat.turn - 1) % enemy.intents.length]
   const rewardCardNames = enemy.rewardCardPool.map((id) => cardById[id]?.name ?? id).join('、')
-  return <main><TopBar /><section className="panel combat-scene"><div className="combatants"><article className="combatant"><img className="portrait card-image" src={playerAvatarByBackgroundId[state.player.backgroundId]} alt={`${state.playerName}头像`} /><b>{state.playerName}</b><StatusList statuses={combat.playerStatuses} owner="玩家" /></article><article className="combatant enemy"><img className="portrait card-image" src={enemyArtById[enemy.id]} alt={`${enemy.name}画像`} /><b>{enemy.name}</b><span>气血 {combat.enemyHp}/{enemy.maxHp}</span><StatusList statuses={combat.enemyStatuses} owner="敌人" /></article></div><h2>{enemy.name}</h2><p>敌人气血：{combat.enemyHp}/{enemy.maxHp} · 回合 {combat.turn}</p><p className="intent">敌人意图：{describeEnemyIntent(intent)}</p>{combat.result ? <div className="result-panel"><h3>{combat.result === 'victory' ? '胜利战果' : '败局后果'}</h3><p>{combat.result === 'victory' ? `可得：银两 +${enemy.rewardSilver}，卡牌候选：${rewardCardNames}` : '失去部分气血并退回地图，江湖不会等你。'}</p>{combat.result === 'victory' ? <div className="grid reward-cards">{enemy.rewardCardPool.map((id) => <button className="card deck-card" key={id} onClick={() => store.finishCombat(id)}>{cardById[id]?.name ?? id}</button>)}</div> : <button onClick={() => store.finishCombat()}>{'接受败局'}</button>}</div> : <><p className="hint">出招后会自动结算敌方行动，进入下一回合。</p><div className="grid">{combat.drawnCardIds.map((id, index) => { const card = cardById[id]; const lacksInnerPower = state.player.stats.innerPower < card.costInnerPower; return <button className="card combat-card" key={`${id}-${index}`} disabled={lacksInnerPower} onClick={() => store.playCard(id)}><img className="card-art card-image" src={cardArtById[id]} alt={`${card.name}插画`} /><b>{card.name}</b><small>内力 {card.costInnerPower}</small><small>{card.description}</small>{lacksInnerPower ? <small className="warning">内力不足</small> : null}</button> })}</div></>}<pre>{combat.log.slice(-8).join('\n')}</pre></section></main>
+  return <main><TopBar /><section className="panel combat-scene"><div className="combatants"><article className="combatant"><img className="portrait card-image" src={playerAvatarByBackgroundId[state.player.backgroundId]} alt={`${state.playerName}头像`} /><b>{state.playerName}</b><StatusList statuses={combat.playerStatuses} owner="玩家" /></article><article className="combatant enemy"><img className="portrait card-image" src={enemyArtById[enemy.id]} alt={`${enemy.name}画像`} /><b>{enemy.name}</b><span>气血 {combat.enemyHp}/{enemy.maxHp}</span><StatusList statuses={combat.enemyStatuses} owner="敌人" /></article></div><CombatMomentCue combat={combat} /><h2>{enemy.name}</h2><p>敌人气血：{combat.enemyHp}/{enemy.maxHp} · 回合 {combat.turn}</p><p className="intent">敌人意图：{describeEnemyIntent(intent)}</p>{combat.result ? <div className="result-panel"><h3>{combat.result === 'victory' ? '胜利战果' : '败局后果'}</h3><p>{combat.result === 'victory' ? `可得：银两 +${enemy.rewardSilver}，卡牌候选：${rewardCardNames}` : '失去部分气血并退回地图，江湖不会等你。'}</p>{combat.result === 'victory' ? <div className="grid reward-cards">{enemy.rewardCardPool.map((id) => <button className="card deck-card" key={id} onClick={() => store.finishCombat(id)}>{cardById[id]?.name ?? id}</button>)}</div> : <button onClick={() => store.finishCombat()}>{'接受败局'}</button>}</div> : <><p className="hint">出招后会自动结算敌方行动，进入下一回合。</p><div className="grid">{combat.drawnCardIds.map((id, index) => { const card = cardById[id]; const lacksInnerPower = state.player.stats.innerPower < card.costInnerPower; return <button className="card combat-card" key={`${id}-${index}`} disabled={lacksInnerPower} onClick={() => store.playCard(id)}><img className="card-art card-image" src={cardArtById[id]} alt={`${card.name}插画`} /><b>{card.name}</b><small>内力 {card.costInnerPower}</small><small>{card.description}</small>{lacksInnerPower ? <small className="warning">内力不足</small> : null}</button> })}</div></>}<pre>{combat.log.slice(-8).join('\n')}</pre></section></main>
 }
 
 function HeroinePage() {
