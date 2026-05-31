@@ -1,6 +1,13 @@
 import type { GameState, LocationId } from '../types/game'
 
 export function getLocationGuidance(state: GameState, locationId: LocationId): string | undefined {
+  if (state.flags.includes('blood_altar_disrupted')) {
+    if (!state.flags.includes('ch3_town_blood_jade_traced')) return locationId === 'town' ? '主线：追查血玉残片' : undefined
+    if (!state.flags.includes('ch3_blood_river_remnant_defeated')) return locationId === 'forest' ? '主线：截击血河余党' : undefined
+    if (!state.endingId) return locationId === 'teahouse' ? '终局：决定血河经归处' : undefined
+    return undefined
+  }
+
   if (state.flags.includes('ch1_black_market_boss_defeated')) return undefined
 
   if (!state.flags.includes('ch1_bandit_notice_taken')) {

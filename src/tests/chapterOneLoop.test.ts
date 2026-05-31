@@ -3,7 +3,7 @@ import { cards } from '../data/cards'
 import { enemies } from '../data/enemies'
 import { events } from '../data/events'
 import { getCurrentGoal } from '../engine/goalEngine'
-import { pickEventForLocation } from '../engine/eventEngine'
+import { pickEventForLocation, applyChoice } from '../engine/eventEngine'
 import { makeState } from './helpers'
 
 describe('chapter one onboarding loop', () => {
@@ -168,5 +168,20 @@ describe('chapter one onboarding loop', () => {
         if (effect.type === 'start_combat') expect(enemyIds.has(effect.enemyId)).toBe(true)
       }
     }
+  })
+
+  it('resolves each final teahouse choice to a distinct ending', () => {
+    const finalEvent = events.find((event) => event.id === 'ch3_teahouse_final_choice_01')!
+    const endingChoices = Object.fromEntries(finalEvent.choices.map((choice) => [choice.id, choice]))
+    const finalState = {
+      ...makeState(),
+      currentEventId: finalEvent.id,
+      flags: ['blood_altar_disrupted', 'ch3_town_blood_jade_traced', 'ch3_blood_river_remnant_defeated'],
+      stamina: 6,
+    }
+
+    expect(applyChoice(finalState, endingChoices.seal).endingId).toBe('righteous_rising')
+    expect(applyChoice(finalState, endingChoices.cure).endingId).toBe('bai_zhi_good')
+    expect(applyChoice(finalState, endingChoices.practice).endingId).toBe('demon_fall')
   })
 })

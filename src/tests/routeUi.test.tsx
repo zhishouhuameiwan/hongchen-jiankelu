@@ -549,6 +549,33 @@ describe('route UI presentation', () => {
     expect(screen.getByText('缘线：沈青霜')).toBeInTheDocument()
   })
 
+  it('renders the final teahouse choice and transitions to the selected ending', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        screen: 'event',
+        currentLocationId: 'teahouse',
+        currentEventId: 'ch3_teahouse_final_choice_01',
+        flags: ['blood_altar_disrupted', 'ch3_town_blood_jade_traced', 'ch3_blood_river_remnant_defeated'],
+        stamina: 6,
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+
+    expect(screen.getByRole('heading', { name: '终局·茶楼定卷' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /将血河经交由正道封印/ })).toHaveTextContent('结局')
+
+    fireEvent.click(screen.getByRole('button', { name: /将血河经交由正道封印/ }))
+
+    expect(screen.getByRole('heading', { name: '正道新秀' })).toBeInTheDocument()
+    expect(screen.getByText(/你协助正道封印魔功/)).toBeInTheDocument()
+    expect(useGameStore.getState().state!.screen).toBe('ending')
+    expect(useGameStore.getState().state!.endingId).toBe('righteous_rising')
+  })
+
   it('shows endgame pressure after day 25 in the top bar', () => {
     const state = createInitialGameState('测试侠客', 'wandering_swordsman')
     useGameStore.setState({

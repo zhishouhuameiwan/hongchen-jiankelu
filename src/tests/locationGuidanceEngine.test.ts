@@ -41,6 +41,17 @@ describe('getLocationGuidance', () => {
     expect(getLocationGuidance(ready, 'ruined_temple')).toBe('主线：夜探破庙黑市')
   })
 
+  it('guides chapter three locations until the final teahouse choice is available', () => {
+    const chapterTwoDone = stateWith({ flags: ['ch1_black_market_boss_defeated', 'blood_river_fragment_found', 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen', 'blood_altar_disrupted'] })
+    expect(getLocationGuidance(chapterTwoDone, 'town')).toBe('主线：追查血玉残片')
+
+    const traced = stateWith({ ...chapterTwoDone, flags: [...chapterTwoDone.flags, 'ch3_town_blood_jade_traced'] })
+    expect(getLocationGuidance(traced, 'forest')).toBe('主线：截击血河余党')
+
+    const remnantDefeated = stateWith({ ...traced, flags: [...traced.flags, 'ch3_blood_river_remnant_defeated'] })
+    expect(getLocationGuidance(remnantDefeated, 'teahouse')).toBe('终局：决定血河经归处')
+  })
+
   it('stops showing chapter one guidance after the boss is defeated', () => {
     const state = stateWith({ flags: ['ch1_black_market_boss_defeated'] })
 
