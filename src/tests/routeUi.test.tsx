@@ -105,6 +105,39 @@ describe('route UI presentation', () => {
     expect(screen.getByText('终局将近：前往破庙黑市处理血河异动，或回茶馆作最终抉择。')).toBeInTheDocument()
   })
 
+  it('shows chapter one guidance hints on visible map location cards', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({ state: { ...state, screen: 'map' }, setupScreen: 'menu' })
+
+    render(<App />)
+
+    expect(screen.getByRole('button', { name: /青石镇/ })).toHaveTextContent('主线：去城镇接镖局急帖')
+  })
+
+  it('shows blocked ruined temple requirements on the location card before the boss', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        screen: 'map',
+        phase: 'night',
+        flags: [
+          'ch1_bandit_notice_taken',
+          'ch1_bandit_defeated',
+          'ch1_prepared_for_boss',
+          'seen_temple_luo_intro_01',
+          'seen_ruined_temple_black_market_ambush_01',
+          'seen_ruined_temple_blood_altar_01',
+        ],
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+
+    expect(screen.getByRole('button', { name: /破庙黑市/ })).toHaveTextContent('需要装备粗铁剑')
+  })
+
   it('shows location travel stamina costs on the map', () => {
     useGameStore.setState({ state: createInitialGameState('测试侠客', 'wandering_swordsman'), setupScreen: 'menu' })
 
@@ -389,6 +422,40 @@ describe('route UI presentation', () => {
     expect(next.log).toContain('新卡入库：横剑格挡。去卡组查看。')
     expect(next.log).toContain('获得物品：小还丹。')
     expect(next.itemBag.small_healing_pill).toBe(1)
+  })
+
+  it('marks chapter one complete after claiming the black market boss victory reward', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        flags: ['ch1_bandit_notice_taken', 'ch1_bandit_defeated', 'ch1_prepared_for_boss'],
+        phase: 'night',
+        screen: 'combat',
+        currentCombat: {
+          enemyId: 'ch1_black_market_boss',
+          enemyHp: 0,
+          playerBlock: 0,
+          enemyBlock: 0,
+          turn: 4,
+          drawnCardIds: ['basic_slash'],
+          playerStatuses: [],
+          enemyStatuses: [],
+          log: ['你赢得了战斗。'],
+          result: 'victory',
+        },
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: '血河逆流' }))
+
+    const next = useGameStore.getState().state!
+    expect(next.flags).toContain('ch1_black_market_boss_defeated')
+    expect(next.flags).toContain('blood_river_fragment_found')
+    expect(next.log).toContain('第一章完成：你击败黑市小头目，夺回血河经残页。')
+    expect(next.screen).toBe('map')
   })
 
   it('shows defeat consequences before accepting combat defeat', () => {

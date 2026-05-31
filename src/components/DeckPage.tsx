@@ -39,6 +39,14 @@ export function DeckPage() {
     <main>
       <TopBar />
       <button onClick={() => go('map')}>返回地图</button>
+      <section className="deck-group prep-panel" aria-label="备战加成">
+        <h2>备战加成</h2>
+        <ul>
+          {Object.values(state.equipment).filter((id): id is string => Boolean(id)).map((id) => <li key={id}>{cardById[id]?.name ?? id}：{getEquipmentBonusText(id)}，战斗中计入对应招式。</li>)}
+          {(state.itemBag.steamed_bun ?? 0) > 0 ? <li>蒸饼：下场战斗开战恢复 4 点气血与 1 点内力。</li> : null}
+        </ul>
+        {!Object.values(state.equipment).some(Boolean) && !(state.itemBag.steamed_bun ?? 0) ? <p className="menu-hint">暂无备战加成。装备武器或备好食物后会在这里显示。</p> : null}
+      </section>
       <section className="deck-group item-panel">
         <h2>物品</h2>
         <p className="menu-hint">消耗品可在行囊中使用；任务物品会保留为后续剧情线索。</p>

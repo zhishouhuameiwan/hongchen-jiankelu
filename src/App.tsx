@@ -8,6 +8,7 @@ import { heroines, locations } from './data/world'
 import { enemyById } from './data/enemies'
 import { describeEnemyIntent } from './engine/combatEngine'
 import { pickSpecialEventForLocation } from './engine/eventEngine'
+import { getLocationGuidance } from './engine/locationGuidanceEngine'
 import { useGameStore } from './store/gameStore'
 import { TopBar } from './components/TopBar'
 import { EventPage } from './components/EventPage'
@@ -37,8 +38,8 @@ function NewGame() {
 function MapPage() {
   const state = useGameStore((s) => s.state)!
   const store = useGameStore()
-  const visibleLocations = locations.filter((loc) => pickSpecialEventForLocation(state, events, loc.id)).slice(0, 3)
-  return <main><TopBar /><nav><button onClick={() => store.go('heroine')}>红颜</button><button onClick={() => store.go('deck')}>卡组</button></nav><GoalPanel state={state} /><section className="grid">{visibleLocations.map((loc) => { const specialEvent = pickSpecialEventForLocation(state, events, loc.id); const affordable = state.stamina >= loc.staminaCost; return <button className="card location-card" key={loc.id} disabled={!affordable} onClick={() => store.exploreLocation(loc.id)}><img className="location-art card-image" src={locationArtById[loc.id]} alt={`${loc.name}场景`} /><h3>{loc.name}</h3><p>{state.phase === 'day' ? loc.dayDescription : loc.nightDescription}</p><small>路程体力 -{loc.staminaCost}</small><small>{specialEvent ? `可触发：${specialEvent.title}` : '暂无特殊事件'}</small>{!affordable ? <small>体力不足，先结束时段休整</small> : null}</button> })}</section><Log /></main>
+  const visibleLocations = locations.filter((loc) => pickSpecialEventForLocation(state, events, loc.id) || getLocationGuidance(state, loc.id)).slice(0, 3)
+  return <main><TopBar /><nav><button onClick={() => store.go('heroine')}>红颜</button><button onClick={() => store.go('deck')}>卡组</button></nav><GoalPanel state={state} /><section className="grid">{visibleLocations.map((loc) => { const specialEvent = pickSpecialEventForLocation(state, events, loc.id); const guidance = getLocationGuidance(state, loc.id); const affordable = state.stamina >= loc.staminaCost; return <button className="card location-card" key={loc.id} disabled={!affordable || !specialEvent} onClick={() => store.exploreLocation(loc.id)}><img className="location-art card-image" src={locationArtById[loc.id]} alt={`${loc.name}场景`} /><h3>{loc.name}</h3><p>{state.phase === 'day' ? loc.dayDescription : loc.nightDescription}</p>{guidance ? <small className="location-guidance">{guidance}</small> : null}<small>路程体力 -{loc.staminaCost}</small><small>{specialEvent ? `可触发：${specialEvent.title}` : '条件未满足'}</small>{!affordable ? <small>体力不足，先结束时段休整</small> : null}</button> })}</section><Log /></main>
 }
 
 function StatusList({ statuses, owner }: { statuses: { id: string; amount: number }[]; owner: string }) {

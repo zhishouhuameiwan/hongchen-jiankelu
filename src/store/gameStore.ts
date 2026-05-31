@@ -112,8 +112,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const enemy = enemyById[state.currentCombat.enemyId]
       const rewardCard = rewardCardId ?? enemy.rewardCardPool[0]
       const gainedNewCard = !state.deck.includes(rewardCard)
-      const gainLogs = [`战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`, ...(gainedNewCard ? [`新卡入库：${cardById[rewardCard]?.name ?? rewardCard}。去卡组查看。`] : []), '获得物品：小还丹。']
-      const next = { ...state, screen: 'map' as const, currentCombat: undefined, currentEventId: undefined, currentLocationId: undefined, deck: gainedNewCard ? [...state.deck, rewardCard] : state.deck, itemBag: { ...state.itemBag, small_healing_pill: (state.itemBag.small_healing_pill ?? 0) + 1 }, player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, ...gainLogs] }
+      const chapterOneBossVictory = enemy.id === 'ch1_black_market_boss'
+      const chapterOneFlags = chapterOneBossVictory ? ['ch1_black_market_boss_defeated', 'blood_river_fragment_found'] : []
+      const chapterOneLogs = chapterOneBossVictory ? ['第一章完成：你击败黑市小头目，夺回血河经残页。'] : []
+      const gainLogs = [`战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`, ...(gainedNewCard ? [`新卡入库：${cardById[rewardCard]?.name ?? rewardCard}。去卡组查看。`] : []), '获得物品：小还丹。', ...chapterOneLogs]
+      const nextFlags = [...state.flags, ...chapterOneFlags.filter((flag) => !state.flags.includes(flag))]
+      const next = { ...state, screen: 'map' as const, currentCombat: undefined, currentEventId: undefined, currentLocationId: undefined, flags: nextFlags, deck: gainedNewCard ? [...state.deck, rewardCard] : state.deck, itemBag: { ...state.itemBag, small_healing_pill: (state.itemBag.small_healing_pill ?? 0) + 1 }, player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, ...gainLogs] }
       set({ state: persist(advancePhase(next)) })
     } else {
       const ending = chooseEnding({ ...state, player: { ...state.player, stats: { ...state.player.stats, hp: 0 } } }, endings)
