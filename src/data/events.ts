@@ -29,6 +29,19 @@ export const events: GameEvent[] = [
     { id: 'disrupt', text: '斩碎血坛引出幕后傀儡', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'start_combat', enemyId: 'blood_river_puppet' }] },
     { id: 'read', text: '冒险默记血纹逆流法', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'gain_card', cardId: 'blood_river_strike' }, { type: 'gain_item', itemId: 'blood_jade_fragment' }, { type: 'stat', stat: 'demonHeart', value: 2 }] },
   ] },
+  { id: 'ch3_town_blood_jade_trace_01', title: '第三章·血玉追踪', phase: 'day', locationId: 'town', weight: 330, requirements: [{ type: 'flag', value: 'blood_altar_disrupted' }, { type: 'flag_missing', value: 'ch3_town_blood_jade_traced' }], text: '青石镇铁匠认出血玉残片上的裂纹，说这是破庙黑市用来召集血河余党的信物。若不截断传信，完整残卷很快会流入魔道。', choices: [
+    { id: 'trace', text: '顺着血玉裂纹追查信使', staminaCost: 1, effects: [{ type: 'set_flag', value: 'ch3_town_blood_jade_traced' }, { type: 'set_flag', value: 'blood_river_clue' }, { type: 'stat', stat: 'mind', value: 1 }] },
+    { id: 'rally', text: '请镇民协助封锁黑市去路', staminaCost: 1, effects: [{ type: 'set_flag', value: 'ch3_town_blood_jade_traced' }, { type: 'stat', stat: 'reputation', value: 2 }, { type: 'gain_item', itemId: 'small_healing_pill' }] },
+  ] },
+  { id: 'ch3_forest_blood_river_remnant_01', title: '第三章·截断血路', phase: 'day', locationId: 'forest', weight: 325, requirements: [{ type: 'flag', value: 'ch3_town_blood_jade_traced' }, { type: 'flag_missing', value: 'ch3_blood_river_remnant_defeated' }], text: '黑松林旧猎棚外，血河余党正以残页引人入魔。风过林梢，完整残卷的下落只差这一战。', choices: [
+    { id: 'duel', text: '正面截击血河余党', staminaCost: 2, effects: [{ type: 'set_flag', value: 'ch3_blood_river_remnant_defeated' }, { type: 'set_flag', value: 'blood_river_complete_scroll_found' }, { type: 'start_combat', enemyId: 'blood_river_puppet' }] },
+    { id: 'ambush', text: '毁掉传信血玉夺回残卷', staminaCost: 2, effects: [{ type: 'set_flag', value: 'ch3_blood_river_remnant_defeated' }, { type: 'set_flag', value: 'blood_river_complete_scroll_found' }, { type: 'gain_card', cardId: 'frost_seal' }, { type: 'stat', stat: 'reputation', value: 1 }] },
+  ] },
+  { id: 'ch3_teahouse_final_choice_01', title: '终局·茶楼定卷', phase: 'day', locationId: 'teahouse', weight: 1200, requirements: [{ type: 'flag', value: 'ch3_blood_river_remnant_defeated' }], text: '茶楼二层忽然安静下来。完整《血河经》摆在案上，正道、魔道与无数无名百姓的命运，都等你一句话。', choices: [
+    { id: 'seal', text: '将血河经交由正道封印', staminaCost: 1, effects: [{ type: 'set_flag', value: 'blood_river_sealed' }, { type: 'stat', stat: 'reputation', value: 5 }, { type: 'end_game', endingId: 'righteous_rising' }] },
+    { id: 'cure', text: '交给白芷推演解法', staminaCost: 1, effects: [{ type: 'set_flag', value: 'blood_river_cured' }, { type: 'end_game', endingId: 'bai_zhi_good' }] },
+    { id: 'practice', text: '私藏残卷修成血河异法', staminaCost: 1, effects: [{ type: 'stat', stat: 'demonHeart', value: 10 }, { type: 'end_game', endingId: 'demon_fall' }] },
+  ] },
   { id: 'teahouse_blood_river_rumor_01', title: '血河传闻', phase: 'day', locationId: 'teahouse', weight: 100, requirements: [{ type: 'flag_missing', value: 'heard_blood_river_rumor' }, { type: 'flag_missing', value: 'ch1_black_market_boss_defeated' }], text: '说书人醒木一拍，说起失传百年的《血河经》重现破庙黑市。满堂茶客忽然安静。', choices: [
     { id: 'listen', text: '细听传闻', staminaCost: 1, effects: [{ type: 'set_flag', value: 'heard_blood_river_rumor' }, { type: 'set_flag', value: 'blood_river_clue' }] },
     { id: 'ask', text: '打赏说书人追问线索', staminaCost: 1, effects: [{ type: 'set_flag', value: 'heard_blood_river_rumor' }, { type: 'gain_silver', value: -5 }, { type: 'set_flag', value: 'temple_opened' }] },

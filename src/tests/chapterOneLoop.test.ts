@@ -121,4 +121,52 @@ describe('chapter one onboarding loop', () => {
       }
     }
   })
+
+  it('guides the post-chapter-two endgame through final preparation and final choice beats', () => {
+    const fresh = makeState()
+    const chapterTwoDone = {
+      ...fresh,
+      flags: ['ch1_black_market_boss_defeated', 'blood_river_fragment_found', 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen', 'blood_altar_disrupted'],
+    }
+    expect(getCurrentGoal(chapterTwoDone)).toBe('第三章：回青石镇追查血玉残片来历，备战血河余党。')
+
+    expect(getCurrentGoal({ ...chapterTwoDone, flags: [...chapterTwoDone.flags, 'ch3_town_blood_jade_traced'] })).toBe('第三章：前往黑松林截击血河余党，夺回完整残卷。')
+    expect(getCurrentGoal({ ...chapterTwoDone, flags: [...chapterTwoDone.flags, 'ch3_town_blood_jade_traced', 'ch3_blood_river_remnant_defeated'] })).toBe('终局：去茶馆作出血河经最终抉择。')
+  })
+
+  it('chains chapter-three endgame from town investigation to forest remnant to teahouse final choice', () => {
+    const fresh = makeState()
+    const chapterTwoDone = {
+      ...fresh,
+      flags: ['ch1_black_market_boss_defeated', 'blood_river_fragment_found', 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen', 'blood_altar_disrupted'],
+    }
+    expect(pickEventForLocation(chapterTwoDone, events, 'town').id).toBe('ch3_town_blood_jade_trace_01')
+
+    const traceFound = { ...chapterTwoDone, flags: [...chapterTwoDone.flags, 'ch3_town_blood_jade_traced'] }
+    expect(pickEventForLocation(traceFound, events, 'forest').id).toBe('ch3_forest_blood_river_remnant_01')
+
+    const remnantDefeated = {
+      ...traceFound,
+      flags: [...traceFound.flags, 'ch3_blood_river_remnant_defeated'],
+    }
+    expect(pickEventForLocation(remnantDefeated, events, 'teahouse').id).toBe('ch3_teahouse_final_choice_01')
+  })
+
+  it('has third chapter marker content with defined card and enemy references', () => {
+    const chapterThreeEvents = events.filter((event) => event.id.startsWith('ch3_'))
+    const cardIds = new Set(cards.map((card) => card.id))
+    const enemyIds = new Set(enemies.map((enemy) => enemy.id))
+
+    expect(chapterThreeEvents.map((event) => event.id)).toEqual([
+      'ch3_town_blood_jade_trace_01',
+      'ch3_forest_blood_river_remnant_01',
+      'ch3_teahouse_final_choice_01',
+    ])
+    for (const event of chapterThreeEvents) {
+      for (const effect of event.choices.flatMap((choice) => choice.effects)) {
+        if (effect.type === 'gain_card') expect(cardIds.has(effect.cardId)).toBe(true)
+        if (effect.type === 'start_combat') expect(enemyIds.has(effect.enemyId)).toBe(true)
+      }
+    }
+  })
 })

@@ -99,10 +99,10 @@ describe('route UI presentation', () => {
     expect(screen.getByText('推进白芷缘线：关注医馆与相关选择。')).toBeInTheDocument()
 
     const late = createInitialGameState('测试侠客', 'wandering_swordsman')
-    useGameStore.setState({ state: { ...late, screen: 'map', day: 26, flags: ['blood_river_fragment_found', 'ch1_black_market_boss_defeated', 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen', 'blood_altar_disrupted'] }, setupScreen: 'menu' })
+    useGameStore.setState({ state: { ...late, screen: 'map', day: 26, flags: ['blood_river_fragment_found', 'ch1_black_market_boss_defeated', 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen', 'blood_altar_disrupted', 'ch3_town_blood_jade_traced', 'ch3_blood_river_remnant_defeated'] }, setupScreen: 'menu' })
     rerender(<App />)
 
-    expect(screen.getByText('终局将近：前往破庙黑市处理血河异动，或回茶馆作最终抉择。')).toBeInTheDocument()
+    expect(screen.getByText('终局：去茶馆作出血河经最终抉择。')).toBeInTheDocument()
   })
 
   it('shows chapter one guidance hints on visible map location cards', () => {

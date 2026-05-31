@@ -36,6 +36,18 @@ export function getCurrentGoal(state: GameState): string {
     }
   }
 
+  if (state.flags.includes('blood_altar_disrupted')) {
+    if (!state.flags.includes('ch3_town_blood_jade_traced')) {
+      return '第三章：回青石镇追查血玉残片来历，备战血河余党。'
+    }
+
+    if (!state.flags.includes('ch3_blood_river_remnant_defeated')) {
+      return '第三章：前往黑松林截击血河余党，夺回完整残卷。'
+    }
+
+    return '终局：去茶馆作出血河经最终抉择。'
+  }
+
   if (state.day >= 25 && state.flags.includes('blood_river_fragment_found')) {
     return '终局将近：前往破庙黑市处理血河异动，或回茶馆作最终抉择。'
   }
