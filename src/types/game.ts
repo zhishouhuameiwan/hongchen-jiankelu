@@ -34,6 +34,8 @@ export type Requirement =
   | { type: 'day_max'; value: number }
   | { type: 'stamina_min'; value: number }
   | { type: 'silver_min'; value: number }
+  | { type: 'has_equipped'; cardId: string }
+  | { type: 'has_item'; itemId: string; amount?: number }
   | { type: 'heroine_affection_min'; heroine: HeroineId; value: number }
   | { type: 'heroine_belief_min'; heroine: HeroineId; value: number }
   | { type: 'heroine_stage'; heroine: HeroineId; value: number }

@@ -9,6 +9,8 @@ export function checkRequirement(state: GameState, req: Requirement): boolean {
     case 'day_max': return state.day <= req.value
     case 'stamina_min': return state.stamina >= req.value
     case 'silver_min': return state.player.silver >= req.value
+    case 'has_equipped': return Object.values(state.equipment ?? {}).includes(req.cardId)
+    case 'has_item': return (state.itemBag[req.itemId] ?? 0) >= (req.amount ?? 1)
     case 'heroine_affection_min': return state.heroineStates[req.heroine].affection >= req.value
     case 'heroine_belief_min': return state.heroineStates[req.heroine].belief >= req.value
     case 'heroine_stage': return state.heroineStates[req.heroine].routeStage === req.value

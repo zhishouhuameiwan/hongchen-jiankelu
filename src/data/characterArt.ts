@@ -19,6 +19,7 @@ export const enemyArtById: Record<EnemyDefinition['id'], string> = {
   forest_iron_monk: '/assets/figures/enemies/forest_iron_monk.svg',
   mad_martial_artist: '/assets/figures/enemies/mad_martial_artist.svg',
   black_market_master: '/assets/figures/enemies/black_market_master.svg',
+  ch1_black_market_boss: '/assets/figures/enemies/ch1_black_market_boss.svg',
   blood_river_puppet: '/assets/figures/enemies/blood_river_puppet.svg',
 }
 

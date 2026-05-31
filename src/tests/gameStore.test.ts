@@ -52,7 +52,7 @@ describe('gameStore exploration flow', () => {
     const store = useGameStore.getState()
     store.clearSavedGame()
     const state = createInitialGameState('测试侠客', 'wandering_swordsman')
-    useGameStore.setState({ state: { ...state, flags: ['seen_town_bandit_notice_01', 'visited_weapon_stall'] }, setupScreen: 'menu' })
+    useGameStore.setState({ state: { ...state, flags: ['seen_town_bandit_notice_01', 'visited_weapon_stall', 'ch1_black_market_boss_defeated'] }, setupScreen: 'menu' })
 
     store.exploreLocation('town')
 

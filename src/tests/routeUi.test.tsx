@@ -48,6 +48,7 @@ describe('route UI presentation', () => {
         flags: [
           'seen_town_bandit_notice_01',
           'visited_weapon_stall',
+          'ch1_black_market_boss_defeated',
           'seen_teahouse_blood_river_rumor_01',
           'seen_teahouse_blood_river_investigation_02',
           'seen_forest_inner_power_trial_01',
@@ -89,16 +90,16 @@ describe('route UI presentation', () => {
     const { rerender } = render(<App />)
 
     expect(screen.getByText('当前目标')).toBeInTheDocument()
-    expect(screen.getByText('寻找血河经线索：茶馆与黑松林常有风声。')).toBeInTheDocument()
+    expect(screen.getByText('第一章：去青石镇接镖局悬赏，攒银两添置兵器。')).toBeInTheDocument()
 
     const routed = createInitialGameState('测试侠客', 'wandering_swordsman')
-    useGameStore.setState({ state: { ...routed, screen: 'map', flags: ['route_locked_bai_zhi'] }, setupScreen: 'menu' })
+    useGameStore.setState({ state: { ...routed, screen: 'map', flags: ['route_locked_bai_zhi', 'ch1_black_market_boss_defeated'] }, setupScreen: 'menu' })
     rerender(<App />)
 
     expect(screen.getByText('推进白芷缘线：关注医馆与相关选择。')).toBeInTheDocument()
 
     const late = createInitialGameState('测试侠客', 'wandering_swordsman')
-    useGameStore.setState({ state: { ...late, screen: 'map', day: 26, flags: ['blood_river_fragment_found'] }, setupScreen: 'menu' })
+    useGameStore.setState({ state: { ...late, screen: 'map', day: 26, flags: ['blood_river_fragment_found', 'ch1_black_market_boss_defeated'] }, setupScreen: 'menu' })
     rerender(<App />)
 
     expect(screen.getByText('终局将近：前往破庙黑市处理血河异动，或回茶馆作最终抉择。')).toBeInTheDocument()
@@ -562,7 +563,7 @@ describe('route UI presentation', () => {
     useGameStore.setState({
       state: {
         ...state,
-        flags: ['seen_town_bandit_notice_01', 'visited_weapon_stall'],
+        flags: ['seen_town_bandit_notice_01', 'visited_weapon_stall', 'ch1_black_market_boss_defeated'],
         screen: 'map',
       },
       setupScreen: 'menu',

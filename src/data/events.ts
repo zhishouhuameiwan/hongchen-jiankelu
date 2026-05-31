@@ -1,6 +1,22 @@
 import type { GameEvent } from '../types/game'
 
 export const events: GameEvent[] = [
+  { id: 'ch1_town_bandit_notice_01', title: '第一章·镖局急帖', phase: 'day', locationId: 'town', weight: 260, requirements: [{ type: 'flag_missing', value: 'ch1_bandit_notice_taken' }, { type: 'flag_missing', value: 'ch1_bandit_defeated' }, { type: 'flag_missing', value: 'ch1_prepared_for_boss' }, { type: 'flag_missing', value: 'ch1_black_market_boss_defeated' }], text: '青石镇镖局门前围满行人，急帖上写着黑松林劫匪截走药材与粮袋。总镖头缺人手，只问你敢不敢接下第一趟江湖差事。', choices: [
+    { id: 'accept', text: '接下悬赏，追查黑松林劫匪', staminaCost: 1, effects: [{ type: 'set_flag', value: 'ch1_bandit_notice_taken' }, { type: 'gain_silver', value: 6 }, { type: 'gain_item', itemId: 'dry_ration' }] },
+    { id: 'ask_supply', text: '先问清补给与兵器价钱', staminaCost: 1, effects: [{ type: 'set_flag', value: 'ch1_bandit_notice_taken' }, { type: 'gain_silver', value: 4 }, { type: 'gain_item', itemId: 'spring_water' }] },
+  ] },
+  { id: 'ch1_forest_bandit_trail_01', title: '第一章·黑松林匪踪', phase: 'day', locationId: 'forest', weight: 250, requirements: [{ type: 'flag', value: 'ch1_bandit_notice_taken' }, { type: 'flag_missing', value: 'ch1_bandit_defeated' }, { type: 'flag_missing', value: 'ch1_black_market_boss_defeated' }], text: '黑松林湿雾沉沉，断枝旁散着麦粉与药草。劫匪的脚印通向旧猎棚，棚中还留着几袋可用食材。', choices: [
+    { id: 'ambush', text: '伏击劫匪，夺回补给', staminaCost: 2, effects: [{ type: 'start_combat', enemyId: 'bandit' }, { type: 'set_flag', value: 'ch1_bandit_defeated' }, { type: 'gain_item', itemId: 'wheat_flour' }, { type: 'gain_item', itemId: 'spring_water' }, { type: 'gain_item', itemId: 'wild_herb' }] },
+    { id: 'endure_training', text: '循踪前先练横练护身', staminaCost: 2, effects: [{ type: 'set_flag', value: 'ch1_bandit_defeated' }, { type: 'gain_card', cardId: 'iron_cloth' }, { type: 'gain_item', itemId: 'wheat_flour' }, { type: 'gain_item', itemId: 'spring_water' }] },
+  ] },
+  { id: 'ch1_town_reward_and_supply_01', title: '第一章·交差添装', phase: 'day', locationId: 'town', weight: 240, requirements: [{ type: 'flag', value: 'ch1_bandit_defeated' }, { type: 'flag_missing', value: 'ch1_prepared_for_boss' }, { type: 'flag_missing', value: 'ch1_black_market_boss_defeated' }], text: '总镖头验过夺回的补给，递来赏银，又指向街口兵器摊：夜里若要查破庙黑市，至少得有一柄称手兵器与一口热食。', choices: [
+    { id: 'buy_sword_and_cook', text: '买粗铁剑，再备蒸饼夜探', staminaCost: 1, requirements: [{ type: 'silver_min', value: 12 }], effects: [{ type: 'gain_silver', value: 12 }, { type: 'gain_card', cardId: 'plain_iron_sword' }, { type: 'gain_item', itemId: 'wheat_flour' }, { type: 'gain_item', itemId: 'spring_water' }, { type: 'set_flag', value: 'ch1_prepared_for_boss' }] },
+    { id: 'take_supplies', text: '换取食材与黑市口信', staminaCost: 1, effects: [{ type: 'gain_silver', value: 6 }, { type: 'gain_item', itemId: 'wheat_flour' }, { type: 'gain_item', itemId: 'spring_water' }, { type: 'learn_recipe', recipeId: 'steamed_bun' }, { type: 'set_flag', value: 'ch1_prepared_for_boss' }] },
+  ] },
+  { id: 'ch1_ruined_temple_black_market_boss_01', title: '第一章·破庙黑市', phase: 'night', locationId: 'ruined_temple', weight: 320, requirements: [{ type: 'flag', value: 'ch1_bandit_notice_taken' }, { type: 'flag', value: 'ch1_bandit_defeated' }, { type: 'flag', value: 'ch1_prepared_for_boss' }, { type: 'has_equipped', cardId: 'plain_iron_sword' }, { type: 'has_item', itemId: 'steamed_bun', amount: 1 }, { type: 'phase', value: 'night' }, { type: 'flag_missing', value: 'ch1_black_market_boss_defeated' }], text: '破庙黑市灯火如豆，戴斗笠的黑市高手拦在残碑前。他看见你腰间粗铁剑与行囊热食，冷笑道：看来青石镇来了个真敢赴约的人。', choices: [
+    { id: 'duel', text: '拔剑挑战黑市高手', staminaCost: 2, effects: [{ type: 'start_combat', enemyId: 'ch1_black_market_boss' }, { type: 'set_flag', value: 'blood_river_clue' }] },
+    { id: 'observe', text: '借蒸饼摊贩身份探听血河线索', staminaCost: 1, effects: [{ type: 'set_flag', value: 'blood_river_clue' }, { type: 'set_flag', value: 'ch1_black_market_boss_defeated' }, { type: 'gain_card', cardId: 'blood_river_strike' }] },
+  ] },
   { id: 'teahouse_blood_river_rumor_01', title: '血河传闻', phase: 'day', locationId: 'teahouse', weight: 100, requirements: [{ type: 'flag_missing', value: 'heard_blood_river_rumor' }], text: '说书人醒木一拍，说起失传百年的《血河经》重现破庙黑市。满堂茶客忽然安静。', choices: [
     { id: 'listen', text: '细听传闻', staminaCost: 1, effects: [{ type: 'set_flag', value: 'heard_blood_river_rumor' }, { type: 'set_flag', value: 'blood_river_clue' }] },
     { id: 'ask', text: '打赏说书人追问线索', staminaCost: 1, effects: [{ type: 'set_flag', value: 'heard_blood_river_rumor' }, { type: 'gain_silver', value: -5 }, { type: 'set_flag', value: 'temple_opened' }] },

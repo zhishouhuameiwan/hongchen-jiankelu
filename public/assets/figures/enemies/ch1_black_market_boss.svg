@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480" role="img" aria-label="破庙黑市头目 · 第一章小 Boss · 古风武侠人物" data-art-direction="ancient-wuxia" data-kind="enemy" data-theme="古风武侠江湖水墨人物">
+  <title>破庙黑市头目 · 第一章小 Boss · 古风武侠人物</title>
+  <desc>古风武侠人物，斗笠黑袍，破庙残碑前持短刀拦路。水墨山水背景、江湖侠客气质、古风衣冠、兵刃与武侠身姿。</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f7ecd2"/><stop offset="0.48" stop-color="#3b2a24"/><stop offset="1" stop-color="#0d0907"/></linearGradient>
+    <radialGradient id="halo" cx="50%" cy="28%" r="62%"><stop stop-color="#f3dfb7" stop-opacity=".5"/><stop offset="1" stop-color="#050403" stop-opacity=".64"/></radialGradient>
+    <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="3" seed="31"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 .16"/></feComponentTransfer></filter>
+    <pattern id="cloud" width="96" height="44" patternUnits="userSpaceOnUse"><path d="M5 29c18-20 40-20 56 0 10-8 23-9 34 0" fill="none" stroke="#f3dfb7" stroke-width="2" opacity=".18"/></pattern>
+  </defs>
+  <rect width="360" height="480" rx="32" fill="#100b08"/>
+  <rect x="14" y="14" width="332" height="452" rx="26" fill="url(#paper)"/>
+  <rect x="14" y="14" width="332" height="452" rx="26" fill="url(#cloud)"/>
+  <rect x="14" y="14" width="332" height="452" rx="26" filter="url(#ink)"/>
+  <path d="M42 405c74-50 208-52 276 0" fill="none" stroke="#050403" stroke-width="26" opacity=".28"/>
+  <path d="M92 385c20-112 55-164 88-164s68 52 88 164z" fill="#281d1a" stroke="#f3d8a6" stroke-width="4" opacity=".98"/>
+  <path d="M112 322c44 28 92 28 136 0" fill="none" stroke="#f7e7bd" stroke-width="6" opacity=".46"/>
+  <path d="M140 222h80l-20 44h-40z" fill="#d8a57f" opacity=".94"/>
+  <circle cx="180" cy="152" r="54" fill="#e5b48d"/>
+  <path d="M92 126c44-48 132-48 176 0-50 15-126 15-176 0z" fill="#17100b"/>
+  <path d="M104 116c36-42 116-42 152 0" fill="none" stroke="#f1d39c" stroke-width="6" opacity=".64"/>
+  <path d="M126 145c24-22 84-27 108 0-30-8-78-8-108 0z" fill="#0b0705" opacity=".86"/>
+  <path d="M146 160c9 7 18 7 27 0M187 160c9 7 18 7 27 0" stroke="#2d120c" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M167 191c9 8 19 8 28 0" stroke="#7f292d" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M72 374l210-214" stroke="#fff2d1" stroke-width="6" opacity=".58"/>
+  <path d="M275 154l26-9-9 26z" fill="#fff2d1" opacity=".78"/>
+  <path d="M64 390c48-28 96-29 144-3" fill="none" stroke="#8b6f4a" stroke-width="8" opacity=".38"/>
+  <circle cx="286" cy="96" r="32" fill="#050403" opacity=".27"/>
+  <text x="286" y="107" text-anchor="middle" font-size="31" font-family="KaiTi, STKaiti, serif" fill="#fff1d1" opacity=".86">魁</text>
+  <rect x="38" y="402" width="284" height="42" rx="21" fill="#080504" opacity=".76"/>
+  <text x="180" y="427" text-anchor="middle" font-size="23" font-family="KaiTi, STKaiti, serif" fill="#fff1d6">破庙黑市头目</text>
+  <text x="180" y="54" text-anchor="middle" font-size="19" font-family="KaiTi, STKaiti, serif" fill="#fff1d6" opacity=".88">第一章小 Boss</text>
+  <rect x="14" y="14" width="332" height="452" rx="26" fill="url(#halo)"/>
+  <rect x="14" y="14" width="332" height="452" rx="26" fill="none" stroke="#f1d9a7" stroke-width="3" opacity=".78"/>
+</svg>
