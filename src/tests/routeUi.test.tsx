@@ -99,7 +99,7 @@ describe('route UI presentation', () => {
     expect(screen.getByText('推进白芷缘线：关注医馆与相关选择。')).toBeInTheDocument()
 
     const late = createInitialGameState('测试侠客', 'wandering_swordsman')
-    useGameStore.setState({ state: { ...late, screen: 'map', day: 26, flags: ['blood_river_fragment_found', 'ch1_black_market_boss_defeated'] }, setupScreen: 'menu' })
+    useGameStore.setState({ state: { ...late, screen: 'map', day: 26, flags: ['blood_river_fragment_found', 'ch1_black_market_boss_defeated', 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen', 'blood_altar_disrupted'] }, setupScreen: 'menu' })
     rerender(<App />)
 
     expect(screen.getByText('终局将近：前往破庙黑市处理血河异动，或回茶馆作最终抉择。')).toBeInTheDocument()
@@ -630,7 +630,8 @@ describe('route UI presentation', () => {
     useGameStore.setState({
       state: {
         ...state,
-        flags: ['seen_town_bandit_notice_01', 'visited_weapon_stall', 'ch1_black_market_boss_defeated'],
+        phase: 'night',
+        flags: ['seen_town_bandit_notice_01', 'visited_weapon_stall', 'ch1_black_market_boss_defeated', 'blood_river_fragment_found', 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen'],
         screen: 'map',
       },
       setupScreen: 'menu',
@@ -639,9 +640,9 @@ describe('route UI presentation', () => {
     render(<App />)
 
     expect(screen.queryByRole('button', { name: /青石镇/ })).not.toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: /路程体力/ })).toHaveLength(3)
-    expect(screen.getByRole('button', { name: /听雨茶楼/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /黑松林/ })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /百草医馆/ })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /路程体力/ })).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: /听雨茶楼/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /破庙黑市/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /百草医馆/ })).not.toBeInTheDocument()
   })
 })

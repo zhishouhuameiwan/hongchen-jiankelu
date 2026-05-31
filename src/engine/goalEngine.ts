@@ -22,6 +22,20 @@ export function getCurrentGoal(state: GameState): string {
     return '第一章：夜探破庙，击败黑市高手，打开血河经主线。'
   }
 
+  if (state.flags.includes('ch1_black_market_boss_defeated') && state.flags.includes('blood_river_fragment_found')) {
+    if (!state.flags.includes('ch2_teahouse_source_found')) {
+      return '第二章：去茶馆查问残页墨痕，确认血河经异动源头。'
+    }
+
+    if (!state.flags.includes('ch2_forest_corruption_seen')) {
+      return '第二章：前往黑松林追查血河失控的江湖客。'
+    }
+
+    if (!state.flags.includes('blood_altar_disrupted')) {
+      return '第二章：入破庙夜探血坛，决定镇压或窃习血河异法。'
+    }
+  }
+
   if (state.day >= 25 && state.flags.includes('blood_river_fragment_found')) {
     return '终局将近：前往破庙黑市处理血河异动，或回茶馆作最终抉择。'
   }

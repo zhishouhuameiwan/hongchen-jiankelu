@@ -17,7 +17,19 @@ export const events: GameEvent[] = [
     { id: 'duel', text: '拔剑挑战黑市高手', staminaCost: 2, effects: [{ type: 'start_combat', enemyId: 'ch1_black_market_boss' }, { type: 'set_flag', value: 'blood_river_clue' }] },
     { id: 'observe', text: '借蒸饼摊贩身份探听血河线索', staminaCost: 1, effects: [{ type: 'set_flag', value: 'blood_river_clue' }, { type: 'set_flag', value: 'ch1_black_market_boss_defeated' }, { type: 'gain_card', cardId: 'blood_river_strike' }] },
   ] },
-  { id: 'teahouse_blood_river_rumor_01', title: '血河传闻', phase: 'day', locationId: 'teahouse', weight: 100, requirements: [{ type: 'flag_missing', value: 'heard_blood_river_rumor' }], text: '说书人醒木一拍，说起失传百年的《血河经》重现破庙黑市。满堂茶客忽然安静。', choices: [
+  { id: 'ch2_teahouse_fragment_source_01', title: '第二章·残页墨痕', phase: 'day', locationId: 'teahouse', weight: 300, requirements: [{ type: 'flag', value: 'ch1_black_market_boss_defeated' }, { type: 'flag', value: 'blood_river_fragment_found' }, { type: 'flag_missing', value: 'ch2_teahouse_source_found' }], text: '茶博士认出残页上的朱砂暗记，低声说黑松林近来有人以血河残式伤人，墨痕的源头恐怕不止破庙黑市。', choices: [
+    { id: 'ask_source', text: '追问朱砂暗记来历', staminaCost: 1, effects: [{ type: 'set_flag', value: 'ch2_teahouse_source_found' }, { type: 'set_flag', value: 'heard_blood_river_rumor' }, { type: 'stat', stat: 'mind', value: 1 }] },
+    { id: 'warn_people', text: '提醒茶客避开黑松林', staminaCost: 1, effects: [{ type: 'set_flag', value: 'ch2_teahouse_source_found' }, { type: 'stat', stat: 'reputation', value: 1 }, { type: 'gain_item', itemId: 'small_healing_pill' }] },
+  ] },
+  { id: 'ch2_forest_blood_river_corruption_01', title: '第二章·血河失控者', phase: 'day', locationId: 'forest', weight: 290, requirements: [{ type: 'flag', value: 'ch2_teahouse_source_found' }, { type: 'flag_missing', value: 'ch2_forest_corruption_seen' }], text: '黑松林深处，一个江湖客双眼赤红，掌心血纹翻涌。他不是寻常劫匪，而是被残页牵动心魔的失控者。', choices: [
+    { id: 'subdue', text: '出手制住失控者', staminaCost: 2, effects: [{ type: 'set_flag', value: 'ch2_forest_corruption_seen' }, { type: 'start_combat', enemyId: 'mad_martial_artist' }, { type: 'gain_card', cardId: 'blood_river_strike' }] },
+    { id: 'observe_pattern', text: '记下血纹逆流轨迹', staminaCost: 1, effects: [{ type: 'set_flag', value: 'ch2_forest_corruption_seen' }, { type: 'stat', stat: 'mind', value: 1 }, { type: 'gain_item', itemId: 'blood_jade_fragment' }] },
+  ] },
+  { id: 'ch2_ruined_temple_blood_altar_01', title: '第二章·血坛夜鸣', phase: 'night', locationId: 'ruined_temple', weight: 310, requirements: [{ type: 'flag', value: 'ch2_forest_corruption_seen' }, { type: 'flag_missing', value: 'blood_altar_disrupted' }, { type: 'phase', value: 'night' }], text: '夜色压住破庙残瓦，血坛纹路与残页墨痕相互呼应。你终于看见血河经借人心复苏的痕迹。', choices: [
+    { id: 'disrupt', text: '斩碎血坛引出幕后傀儡', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'start_combat', enemyId: 'blood_river_puppet' }] },
+    { id: 'read', text: '冒险默记血纹逆流法', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'gain_card', cardId: 'blood_river_strike' }, { type: 'gain_item', itemId: 'blood_jade_fragment' }, { type: 'stat', stat: 'demonHeart', value: 2 }] },
+  ] },
+  { id: 'teahouse_blood_river_rumor_01', title: '血河传闻', phase: 'day', locationId: 'teahouse', weight: 100, requirements: [{ type: 'flag_missing', value: 'heard_blood_river_rumor' }, { type: 'flag_missing', value: 'ch1_black_market_boss_defeated' }], text: '说书人醒木一拍，说起失传百年的《血河经》重现破庙黑市。满堂茶客忽然安静。', choices: [
     { id: 'listen', text: '细听传闻', staminaCost: 1, effects: [{ type: 'set_flag', value: 'heard_blood_river_rumor' }, { type: 'set_flag', value: 'blood_river_clue' }] },
     { id: 'ask', text: '打赏说书人追问线索', staminaCost: 1, effects: [{ type: 'set_flag', value: 'heard_blood_river_rumor' }, { type: 'gain_silver', value: -5 }, { type: 'set_flag', value: 'temple_opened' }] },
   ] },
@@ -92,7 +104,7 @@ export const events: GameEvent[] = [
     { id: 'fight_back', text: '拔剑反截这笔黑吃黑', staminaCost: 2, effects: [{ type: 'set_flag', value: 'black_market_ambush_resolved' }, { type: 'start_combat', enemyId: 'black_market_master' }, { type: 'gain_silver', value: 30 }] },
     { id: 'pay_toll', text: '破财消灾保住性命', staminaCost: 1, effects: [{ type: 'set_flag', value: 'black_market_ambush_resolved' }, { type: 'gain_silver', value: -12 }, { type: 'damage', value: 4 }] },
   ] },
-  { id: 'ruined_temple_blood_altar_01', title: '血坛夜鸣', phase: 'night', locationId: 'ruined_temple', weight: 260, requirements: [{ type: 'day_min', value: 25 }, { type: 'flag', value: 'blood_river_fragment_found' }, { type: 'flag_missing', value: 'blood_altar_disrupted' }], text: '破庙深处，残页墨痕与地上血纹遥相呼应。血河经似乎不再只是传闻，它正在借人心苏醒。', choices: [
+  { id: 'ruined_temple_blood_altar_01', title: '血坛夜鸣', phase: 'night', locationId: 'ruined_temple', weight: 260, requirements: [{ type: 'day_min', value: 25 }, { type: 'flag', value: 'blood_river_fragment_found' }, { type: 'flag_missing', value: 'blood_altar_disrupted' }, { type: 'flag_missing', value: 'ch2_forest_corruption_seen' }], text: '破庙深处，残页墨痕与地上血纹遥相呼应。血河经似乎不再只是传闻，它正在借人心苏醒。', choices: [
     { id: 'disrupt', text: '斩碎血坛引出幕后傀儡', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'start_combat', enemyId: 'blood_river_puppet' }] },
     { id: 'read', text: '冒险默记血纹逆流法', staminaCost: 2, effects: [{ type: 'set_flag', value: 'blood_altar_disrupted' }, { type: 'gain_card', cardId: 'blood_river_strike' }, { type: 'gain_item', itemId: 'blood_jade_fragment' }, { type: 'stat', stat: 'demonHeart', value: 2 }] },
   ] },

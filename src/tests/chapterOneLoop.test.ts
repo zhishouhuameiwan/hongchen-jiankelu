@@ -82,4 +82,43 @@ describe('chapter one onboarding loop', () => {
       }
     }
   })
+
+  it('guides the post-chapter-one blood-river investigation through second-chapter beats', () => {
+    const fresh = makeState()
+    const chapterOneDone = { ...fresh, flags: ['ch1_black_market_boss_defeated', 'blood_river_fragment_found'] }
+    expect(getCurrentGoal(chapterOneDone)).toBe('第二章：去茶馆查问残页墨痕，确认血河经异动源头。')
+
+    expect(getCurrentGoal({ ...fresh, flags: ['ch1_black_market_boss_defeated', 'blood_river_fragment_found', 'ch2_teahouse_source_found'] })).toBe('第二章：前往黑松林追查血河失控的江湖客。')
+    expect(getCurrentGoal({ ...fresh, flags: ['ch1_black_market_boss_defeated', 'blood_river_fragment_found', 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen'] })).toBe('第二章：入破庙夜探血坛，决定镇压或窃习血河异法。')
+  })
+
+  it('chains chapter-two investigation from teahouse to forest to ruined-temple altar', () => {
+    const fresh = makeState()
+    const chapterOneDone = { ...fresh, flags: ['ch1_black_market_boss_defeated', 'blood_river_fragment_found'] }
+    expect(pickEventForLocation(chapterOneDone, events, 'teahouse').id).toBe('ch2_teahouse_fragment_source_01')
+
+    const sourceFound = { ...chapterOneDone, flags: [...chapterOneDone.flags, 'ch2_teahouse_source_found'] }
+    expect(pickEventForLocation(sourceFound, events, 'forest').id).toBe('ch2_forest_blood_river_corruption_01')
+
+    const corruptionSeen = { ...chapterOneDone, phase: 'night' as const, flags: [...chapterOneDone.flags, 'ch2_teahouse_source_found', 'ch2_forest_corruption_seen'] }
+    expect(pickEventForLocation(corruptionSeen, events, 'ruined_temple').id).toBe('ch2_ruined_temple_blood_altar_01')
+  })
+
+  it('has second chapter marker content with defined card and enemy references', () => {
+    const chapterTwoEvents = events.filter((event) => event.id.startsWith('ch2_'))
+    const cardIds = new Set(cards.map((card) => card.id))
+    const enemyIds = new Set(enemies.map((enemy) => enemy.id))
+
+    expect(chapterTwoEvents.map((event) => event.id)).toEqual([
+      'ch2_teahouse_fragment_source_01',
+      'ch2_forest_blood_river_corruption_01',
+      'ch2_ruined_temple_blood_altar_01',
+    ])
+    for (const event of chapterTwoEvents) {
+      for (const effect of event.choices.flatMap((choice) => choice.effects)) {
+        if (effect.type === 'gain_card') expect(cardIds.has(effect.cardId)).toBe(true)
+        if (effect.type === 'start_combat') expect(enemyIds.has(effect.enemyId)).toBe(true)
+      }
+    }
+  })
 })
