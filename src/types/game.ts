@@ -99,6 +99,7 @@ export type CombatPrepBonus = { id: string; text: string }
 export type CombatState = { enemyId: string; enemyHp: number; playerBlock: number; enemyBlock: number; turn: number; actionPoints: number; drawnCardIds: string[]; playerStatuses: CombatStatus[]; enemyStatuses: CombatStatus[]; enemyIntentOverride?: EnemyIntent; log: string[]; prepBonuses?: CombatPrepBonus[]; lastMoment?: CombatMoment; actionTaken?: boolean; result?: 'victory' | 'defeat' }
 
 export type GameState = {
+  saveVersion: number
   screen: Screen
   day: number
   phase: Phase

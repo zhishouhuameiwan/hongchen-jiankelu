@@ -6,7 +6,7 @@ import { events } from './data/events'
 import { locationArtById } from './data/locationArt'
 import { heroines, locations } from './data/world'
 import { enemyById } from './data/enemies'
-import { describeEnemyIntent } from './engine/combatEngine'
+import { describeEnemyIntent, fallbackEnemyTactic, getCardTactic, getTacticMatchup } from './engine/combatEngine'
 import { pickSpecialEventForLocation } from './engine/eventEngine'
 import { getLocationGuidance } from './engine/locationGuidanceEngine'
 import { useGameStore } from './store/gameStore'
@@ -14,7 +14,7 @@ import { TopBar } from './components/TopBar'
 import { EventPage } from './components/EventPage'
 import { DeckPage } from './components/DeckPage'
 import { GoalPanel } from './components/GoalPanel'
-import type { GameState } from './types/game'
+import type { CombatStatus, CombatTactic, EnemyTactic, GameState } from './types/game'
 import { playerAvatarByBackgroundId, enemyArtById, heroineArtById, statusIconById } from './data/characterArt'
 
 const backgrounds = [
@@ -23,6 +23,18 @@ const backgrounds = [
   { id: 'medicine_apprentice', name: '药庐学徒', text: '初始最大气血 +10' },
   { id: 'street_survivor', name: '市井孤儿', text: '初始身法 +1，名声 -1' },
 ]
+
+const tacticLabels: Record<CombatTactic, string> = { attack: '攻击', guard: '格挡', movement: '身法', break: '破势', inner: '调息', trick: '奇术', demonic: '魔功', romance: '红颜' }
+const enemyTacticLabels: Record<EnemyTactic, string> = { assault: '猛攻', guard: '守势', charge: '蓄势', cast: '施术', feint: '虚招' }
+const enemyTacticHints: Record<EnemyTactic, string> = {
+  assault: '猛攻：优先用格挡或身法化解。',
+  guard: '守势：优先用破势拆招，硬攻会吃亏。',
+  charge: '蓄势：趁其未发，用攻击或破势打断。',
+  cast: '施术：破势、调息或奇术能占先机。',
+  feint: '虚招：用身法或奇术试探，谨慎硬攻。',
+}
+const matchupLabels = { advantage: '优势', neutral: '平手', disadvantage: '劣势' }
+const statusLabels: Record<string, string> = { poison: '中毒', vulnerable: '破绽', bleed: '流血', sealed: '封脉', counter: '反击' }
 
 function Menu() {
   const store = useGameStore()
@@ -51,9 +63,9 @@ function MapPage() {
   return <main><TopBar /><nav><button onClick={() => store.go('heroine')}>红颜</button><button onClick={() => store.go('deck')}>卡组</button></nav><GoalPanel state={state} />{visibleLocations.length ? <section className="grid">{visibleLocations.map(({ loc, specialEvent, guidance }) => { const affordable = state.stamina >= loc.staminaCost; return <button className="card location-card" key={loc.id} disabled={!affordable || !specialEvent} onClick={() => store.exploreLocation(loc.id)}><img className="location-art card-image" src={locationArtById[loc.id]} alt={`${loc.name}场景`} /><h3>{loc.name}</h3><p>{state.phase === 'day' ? loc.dayDescription : loc.nightDescription}</p>{guidance ? <small className="location-guidance">{guidance}</small> : null}<small>路程体力 -{loc.staminaCost}</small><small>{specialEvent ? `可触发：${specialEvent.title}` : '条件未满足'}</small>{!affordable ? <small>体力不足，先结束时段休整</small> : null}</button> })}</section> : <section className="panel empty-map"><h2>此时暂无可触发地点。</h2><p>江湖线索暂时沉寂，先调息片刻，换个时辰再行动。</p><button onClick={() => store.advancePhase()}>休整到下一时段</button></section>}<Log /></main>
 }
 
-function StatusList({ statuses, owner }: { statuses: { id: string; amount: number }[]; owner: string }) {
+function StatusList({ statuses, owner }: { statuses: CombatStatus[]; owner: string }) {
   if (!statuses.length) return null
-  return <div className="status-row" aria-label={`${owner}状态`}>{statuses.map((status) => <span className="status-chip" key={`${owner}-${status.id}`}><img src={statusIconById[status.id]} alt={`${status.id}状态`} />{status.id} ×{status.amount}</span>)}</div>
+  return <div className="status-row" aria-label={`${owner}状态`}>{statuses.map((status) => <span className="status-chip" key={`${owner}-${status.id}`}><img src={statusIconById[status.id]} alt={`${status.id}状态`} />{statusLabels[status.id] ?? status.id} ×{status.amount}</span>)}</div>
 }
 
 function CombatMomentCue({ combat }: { combat: NonNullable<GameState['currentCombat']> }) {
@@ -67,8 +79,9 @@ function CombatPage() {
   const combat = state.currentCombat!
   const enemy = enemyById[combat.enemyId]
   const intent = combat.enemyIntentOverride ?? enemy.intents[(combat.turn - 1) % enemy.intents.length]
+  const enemyTactic = fallbackEnemyTactic(intent)
   const rewardCardNames = enemy.rewardCardPool.map((id) => cardById[id]?.name ?? id).join('、')
-  return <main><TopBar /><section className="panel combat-scene"><div className="combatants"><article className="combatant"><img className="portrait card-image" src={playerAvatarByBackgroundId[state.player.backgroundId]} alt={`${state.playerName}头像`} /><b>{state.playerName}</b><StatusList statuses={combat.playerStatuses} owner="玩家" /></article><article className="combatant enemy"><img className="portrait card-image" src={enemyArtById[enemy.id]} alt={`${enemy.name}画像`} /><b>{enemy.name}</b><span>气血 {combat.enemyHp}/{enemy.maxHp}</span><StatusList statuses={combat.enemyStatuses} owner="敌人" /></article></div><CombatMomentCue combat={combat} /><h2>{enemy.name}</h2><p>敌人气血：{combat.enemyHp}/{enemy.maxHp} · 回合 {combat.turn} · 行动点 {combat.actionPoints ?? 3}</p><p className="intent">敌人意图：{describeEnemyIntent(intent)}</p>{combat.result ? <div className="result-panel"><h3>{combat.result === 'victory' ? '胜利战果' : '败局后果'}</h3><p>{combat.result === 'victory' ? `可得：银两 +${enemy.rewardSilver}，卡牌候选：${rewardCardNames}` : '失去部分气血并退回地图，江湖不会等你。'}</p>{combat.result === 'victory' ? <div className="grid reward-cards">{enemy.rewardCardPool.map((id) => <button className="card deck-card" key={id} onClick={() => store.finishCombat(id)}>{cardById[id]?.name ?? id}</button>)}</div> : <button onClick={() => store.finishCombat()}>{'接受败局'}</button>}</div> : <><p className="hint">每回合有 3 点行动点，可连续出招；点“结束回合”结算敌方行动。</p><button onClick={() => store.endTurn()}>结束回合</button><div className="grid">{combat.drawnCardIds.map((id, index) => { const card = cardById[id]; const lacksInnerPower = state.player.stats.innerPower < card.costInnerPower; const lacksAction = (combat.actionPoints ?? 3) < (card.costAction ?? 1); return <button className="card combat-card" key={`${id}-${index}`} disabled={lacksInnerPower || lacksAction} onClick={() => store.playCard(id)}><img className="card-art card-image" src={cardArtById[id]} alt={`${card.name}插画`} /><b>{card.name}</b><small>内力 {card.costInnerPower} · 行动 {card.costAction ?? 1}</small><small>{card.description}</small>{lacksInnerPower ? <small className="warning">内力不足</small> : null}{lacksAction ? <small className="warning">行动点不足</small> : null}</button> })}</div></>}<pre>{combat.log.slice(-8).join('\n')}</pre></section></main>
+  return <main><TopBar /><section className="panel combat-scene"><div className="combatants"><article className="combatant"><img className="portrait card-image" src={playerAvatarByBackgroundId[state.player.backgroundId]} alt={`${state.playerName}头像`} /><b>{state.playerName}</b><StatusList statuses={combat.playerStatuses} owner="玩家" /></article><article className="combatant enemy"><img className="portrait card-image" src={enemyArtById[enemy.id]} alt={`${enemy.name}画像`} /><b>{enemy.name}</b><span>气血 {combat.enemyHp}/{enemy.maxHp}</span><StatusList statuses={combat.enemyStatuses} owner="敌人" /></article></div><CombatMomentCue combat={combat} /><h2>{enemy.name}</h2><p>敌人气血：{combat.enemyHp}/{enemy.maxHp} · 回合 {combat.turn} · 行动点 {combat.actionPoints ?? 3}</p><p className="intent">敌人意图：{describeEnemyIntent(intent)}</p><p className="hint">每回合有 3 点行动点，可连续出招；点“结束回合”结算敌方行动。</p><section className="combat-tutorial" aria-label="战斗入门"><h3>战斗入门</h3><p>行动点：每回合 3 点，可连续出招；点“结束回合”结算敌方行动。</p><p>敌人架势：{enemyTacticLabels[enemyTactic]}</p><p>{enemyTacticHints[enemyTactic]}</p></section>{combat.result ? <div className="result-panel"><h3>{combat.result === 'victory' ? '胜利战果' : '败局后果'}</h3><p>{combat.result === 'victory' ? `可得：银两 +${enemy.rewardSilver}，卡牌候选：${rewardCardNames}` : '失去部分气血并退回地图，江湖不会等你。'}</p>{combat.result === 'victory' ? <div className="grid reward-cards">{enemy.rewardCardPool.map((id) => <button className="card deck-card" key={id} onClick={() => store.finishCombat(id)}>{cardById[id]?.name ?? id}</button>)}</div> : <button onClick={() => store.finishCombat()}>{'接受败局'}</button>}</div> : <><button onClick={() => store.endTurn()}>结束回合</button><div className="grid">{combat.drawnCardIds.map((id, index) => { const card = cardById[id]; const cardTactic = getCardTactic(card); const matchup = getTacticMatchup(cardTactic, enemyTactic); const lacksInnerPower = state.player.stats.innerPower < card.costInnerPower; const lacksAction = (combat.actionPoints ?? 3) < (card.costAction ?? 1); return <button className="card combat-card" key={`${id}-${index}`} disabled={lacksInnerPower || lacksAction} onClick={() => store.playCard(id)}><img className="card-art card-image" src={cardArtById[id]} alt={`${card.name}插画`} /><b>{card.name}</b><small>内力 {card.costInnerPower} · 行动 {card.costAction ?? 1}</small><small>战术：{tacticLabels[cardTactic]}</small><small>克制：{matchupLabels[matchup]}</small><small>{card.description}</small>{lacksAction ? <small>行动点不足</small> : null}{lacksInnerPower ? <small>内力不足</small> : null}</button> })}</div></>}<pre>{combat.log.slice(-6).join('\n')}</pre></section></main>
 }
 
 function HeroinePage() {

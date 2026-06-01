@@ -5,7 +5,7 @@ import { applyChoice } from '../engine/eventEngine'
 import { useItem } from '../engine/itemEngine'
 import { cookRecipe } from '../engine/cookingEngine'
 import { advancePhase } from '../engine/dayPhaseEngine'
-import { clearSave, hasSavedGame, loadGame, saveGame } from '../engine/saveEngine'
+import { CURRENT_SAVE_VERSION, clearSave, hasSavedGame, loadGame, saveGame } from '../engine/saveEngine'
 import { chooseEnding } from '../engine/endingEngine'
 import { endings } from '../data/endings'
 import { events } from '../data/events'
@@ -41,6 +41,7 @@ export type GameStore = {
 
 export function createInitialGameState(name: string, backgroundId: string): GameState {
   return {
+    saveVersion: CURRENT_SAVE_VERSION,
     screen: 'map', day: 1, phase: 'day', stamina: 6, maxStamina: 6, playerName: name || '无名侠客',
     player: { backgroundId, silver: backgroundId === 'fallen_noble' ? 40 : 20, stats: { hp: backgroundId === 'medicine_apprentice' ? 70 : 60, maxHp: backgroundId === 'medicine_apprentice' ? 70 : 60, innerPower: 3, maxInnerPower: 3, attack: backgroundId === 'wandering_swordsman' ? 6 : 5, defense: 2, agility: backgroundId === 'street_survivor' ? 3 : 2, mind: 5, reputation: backgroundId === 'street_survivor' ? -1 : 0, demonHeart: 0 } },
     deck: [...starterDeck], equipment: {}, equipmentBag: [], itemBag: {}, cooking: { knownRecipes: ['steamed_bun'], exp: 0 }, flags: [],
