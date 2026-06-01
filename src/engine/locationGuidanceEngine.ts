@@ -8,7 +8,15 @@ export function getLocationGuidance(state: GameState, locationId: LocationId): s
     return undefined
   }
 
-  if (state.flags.includes('ch1_black_market_boss_defeated')) return undefined
+  if (state.flags.includes('ch1_black_market_boss_defeated')) {
+    if (state.flags.includes('blood_river_fragment_found')) {
+      if (!state.flags.includes('ch2_teahouse_source_found')) return locationId === 'teahouse' ? '主线：查问残页墨痕' : undefined
+      if (!state.flags.includes('ch2_forest_corruption_seen')) return locationId === 'forest' ? '主线：追查血河失控者' : undefined
+      if (state.phase !== 'night') return locationId === 'ruined_temple' ? '夜晚再去破庙' : undefined
+      return locationId === 'ruined_temple' ? '主线：破除血河祭坛' : undefined
+    }
+    return undefined
+  }
 
   if (!state.flags.includes('ch1_bandit_notice_taken')) {
     return locationId === 'town' ? '主线：去城镇接镖局急帖' : undefined
