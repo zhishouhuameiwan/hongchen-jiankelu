@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import App from '../App'
+import { events } from '../data/events'
 import { createInitialGameState, useGameStore } from '../store/gameStore'
 
 afterEach(() => {
@@ -68,6 +69,48 @@ describe('route UI presentation', () => {
     expect(screen.getByRole('button', { name: /百草医馆/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /青霜剑派别院/ })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /破庙黑市/ })).not.toBeInTheDocument()
+  })
+
+  it('offers a rest action when every map location is blocked or exhausted', () => {
+    const state = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...state,
+        screen: 'map',
+        phase: 'night',
+        endingId: 'righteous_rising',
+        flags: [
+          ...events.map((event) => `seen_${event.id}`),
+          'ch1_bandit_notice_taken',
+          'ch1_bandit_defeated',
+          'ch1_prepared_for_boss',
+          'ch1_black_market_boss_defeated',
+          'blood_river_fragment_found',
+          'ch2_teahouse_source_found',
+          'ch2_forest_corruption_seen',
+          'blood_altar_disrupted',
+          'ch3_town_blood_jade_traced',
+          'ch3_blood_river_remnant_defeated',
+        ],
+        heroineStates: {
+          shen_qingshuang: { ...state.heroineStates.shen_qingshuang, routeStage: 3, affection: 99, belief: 99, locked: true },
+          luo_hongling: { ...state.heroineStates.luo_hongling, routeStage: 3, affection: 99, belief: 99, locked: true },
+          bai_zhi: { ...state.heroineStates.bai_zhi, routeStage: 3, affection: 99, belief: 99, locked: true },
+        },
+      },
+      setupScreen: 'menu',
+    })
+
+    render(<App />)
+
+    expect(screen.queryByRole('button', { name: /路程体力/ })).not.toBeInTheDocument()
+    expect(screen.getByText('此时暂无可触发地点。')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '休整到下一时段' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: '休整到下一时段' }))
+
+    expect(useGameStore.getState().state!.day).toBe(2)
+    expect(useGameStore.getState().state!.phase).toBe('day')
   })
 
   it('does not add hot/cold or manual cycling logic to the location deck', () => {
