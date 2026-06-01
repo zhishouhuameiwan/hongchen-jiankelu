@@ -96,7 +96,7 @@ export type EnemyDefinition = { id: string; name: string; maxHp: number; attack:
 export type CombatStatus = { id: string; amount: number }
 export type CombatMoment = { type: 'enemy_hit' | 'player_hit' | 'poison' | 'heal' | 'guard' | 'status' | 'prep'; text: string }
 export type CombatPrepBonus = { id: string; text: string }
-export type CombatState = { enemyId: string; enemyHp: number; playerBlock: number; enemyBlock: number; turn: number; actionPoints: number; drawnCardIds: string[]; playerStatuses: CombatStatus[]; enemyStatuses: CombatStatus[]; log: string[]; prepBonuses?: CombatPrepBonus[]; lastMoment?: CombatMoment; actionTaken?: boolean; result?: 'victory' | 'defeat' }
+export type CombatState = { enemyId: string; enemyHp: number; playerBlock: number; enemyBlock: number; turn: number; actionPoints: number; drawnCardIds: string[]; playerStatuses: CombatStatus[]; enemyStatuses: CombatStatus[]; enemyIntentOverride?: EnemyIntent; log: string[]; prepBonuses?: CombatPrepBonus[]; lastMoment?: CombatMoment; actionTaken?: boolean; result?: 'victory' | 'defeat' }
 
 export type GameState = {
   screen: Screen

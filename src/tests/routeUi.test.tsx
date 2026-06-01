@@ -222,7 +222,7 @@ describe('route UI presentation', () => {
     expect(screen.getByText(/夜色渐深，江湖暗流浮现。/)).toBeInTheDocument()
   })
 
-  it('automatically resolves the enemy action after playing a combat card', () => {
+  it('keeps combat on the player turn after playing a card action', () => {
     const state = createInitialGameState('测试侠客', 'wandering_swordsman')
     useGameStore.setState({
       state: {
@@ -234,6 +234,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 1,
+          actionPoints: 3,
           drawnCardIds: ['basic_slash', 'frost_seal'],
           playerStatuses: [],
           enemyStatuses: [],
@@ -245,14 +246,14 @@ describe('route UI presentation', () => {
     })
 
     render(<App />)
-    expect(screen.queryByRole('button', { name: /结束回合/ })).not.toBeInTheDocument()
-    expect(screen.getByText('出招后会自动结算敌方行动，进入下一回合。')).toBeInTheDocument()
+    expect(screen.getByText('每回合有 3 点行动点，可连续出招；点“结束回合”结算敌方行动。')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /劈风斩/ }))
 
-    expect(useGameStore.getState().state!.currentCombat?.turn).toBe(2)
-    expect(screen.getByText(/回合 2/)).toBeInTheDocument()
-    expect(screen.getByText(/山道劫匪 攻击，造成 6 点伤害。/)).toBeInTheDocument()
+    expect(useGameStore.getState().state!.currentCombat?.turn).toBe(1)
+    expect(useGameStore.getState().state!.currentCombat?.actionPoints).toBe(2)
+    expect(screen.getByText(/回合 1/)).toBeInTheDocument()
+    expect(screen.getByText(/劈风斩 造成 6 点伤害。/)).toBeInTheDocument()
   })
 
   it('shows the latest combat moment as an action cue', () => {
@@ -267,6 +268,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 2,
+          actionPoints: 3,
           drawnCardIds: ['red_lotus_poison'],
           playerStatuses: [],
           enemyStatuses: [{ id: 'poison', amount: 4 }],
@@ -296,6 +298,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 1,
+          actionPoints: 3,
           drawnCardIds: ['basic_slash'],
           playerStatuses: [{ id: 'poison', amount: 3 }],
           enemyStatuses: [{ id: 'sealed', amount: 2 }],
@@ -330,6 +333,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 1,
+          actionPoints: 3,
           drawnCardIds: ['frost_seal'],
           playerStatuses: [],
           enemyStatuses: [],
@@ -370,6 +374,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 1,
+          actionPoints: 3,
           drawnCardIds: ['basic_slash'],
           playerStatuses: [],
           enemyStatuses: [],
@@ -401,6 +406,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 1,
+          actionPoints: 3,
           drawnCardIds: ['basic_slash'],
           playerStatuses: [],
           enemyStatuses: [],
@@ -438,6 +444,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 4,
+          actionPoints: 3,
           drawnCardIds: ['basic_slash'],
           playerStatuses: [],
           enemyStatuses: [],
@@ -470,6 +477,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 2,
+          actionPoints: 3,
           drawnCardIds: ['basic_slash'],
           playerStatuses: [],
           enemyStatuses: [],
@@ -499,6 +507,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 1,
+          actionPoints: 3,
           drawnCardIds: ['basic_slash'],
           playerStatuses: [],
           enemyStatuses: [],
@@ -615,6 +624,7 @@ describe('route UI presentation', () => {
           playerBlock: 0,
           enemyBlock: 0,
           turn: 1,
+          actionPoints: 3,
           drawnCardIds: ['basic_slash'],
           playerStatuses: [],
           enemyStatuses: [],

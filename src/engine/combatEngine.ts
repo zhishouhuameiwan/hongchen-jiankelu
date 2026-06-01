@@ -1,4 +1,4 @@
-import type { CardDefinition, CombatMoment, CombatPrepBonus, EnemyDefinition, EnemyIntent, GameState } from '../types/game'
+import type { CardDefinition, CombatMoment, CombatPrepBonus, CombatTactic, EnemyDefinition, EnemyIntent, EnemyTactic, GameState } from '../types/game'
 import { enemyById } from '../data/enemies'
 import { cardById } from '../data/cards'
 import { itemById } from '../data/items'
@@ -67,6 +67,68 @@ export function getCardActionCost(card: CardDefinition): number {
   return card.costAction ?? 1
 }
 
+export type TacticMatchup = 'advantage' | 'neutral' | 'disadvantage'
+
+export function getCardTactic(card: CardDefinition): CombatTactic {
+  if (card.tactic) return card.tactic
+  if (card.type === 'attack') return 'attack'
+  if (card.type === 'defense') return 'guard'
+  if (card.type === 'movement') return 'movement'
+  if (card.type === 'inner') return 'inner'
+  if (card.type === 'demonic') return 'demonic'
+  if (card.type === 'romance') return 'romance'
+  return 'trick'
+}
+
+export function fallbackEnemyTactic(intent: EnemyIntent): EnemyTactic {
+  if (intent.tactic) return intent.tactic
+  if (intent.type === 'attack') return 'assault'
+  if (intent.type === 'guard') return 'guard'
+  return 'cast'
+}
+
+export function getTacticMatchup(cardTactic: CombatTactic, enemyTactic: EnemyTactic): TacticMatchup {
+  const advantages: Partial<Record<CombatTactic, EnemyTactic[]>> = {
+    attack: ['charge'],
+    guard: ['assault'],
+    movement: ['assault', 'feint'],
+    break: ['guard', 'charge', 'cast'],
+    inner: ['cast'],
+    trick: ['cast', 'feint'],
+    demonic: ['charge'],
+    romance: ['cast'],
+  }
+  const disadvantages: Partial<Record<CombatTactic, EnemyTactic[]>> = {
+    attack: ['guard', 'feint'],
+    guard: ['charge'],
+    break: ['feint'],
+    inner: ['assault'],
+    demonic: ['feint'],
+  }
+  if (advantages[cardTactic]?.includes(enemyTactic)) return 'advantage'
+  if (disadvantages[cardTactic]?.includes(enemyTactic)) return 'disadvantage'
+  return 'neutral'
+}
+
+function getCurrentEnemyIntent(combat: NonNullable<GameState['currentCombat']>, enemy: EnemyDefinition): EnemyIntent {
+  return combat.enemyIntentOverride ?? enemy.intents[(combat.turn - 1) % enemy.intents.length]
+}
+
+function enemyTacticLabel(tactic: EnemyTactic): string {
+  const labels: Record<EnemyTactic, string> = { assault: '猛攻', guard: '守势', charge: '蓄势', cast: '施术', feint: '虚招' }
+  return labels[tactic]
+}
+
+function addStatus(statuses: { id: string; amount: number }[], id: string, amount: number): void {
+  const existing = statuses.find((status) => status.id === id)
+  if (existing) existing.amount += amount
+  else statuses.push({ id, amount })
+}
+
+function getCombatActionPoints(combat: NonNullable<GameState['currentCombat']>): number {
+  return combat.actionPoints ?? 3
+}
+
 function removeOneCardId(cardIds: string[], cardId: string): string[] {
   const index = cardIds.indexOf(cardId)
   if (index === -1) return cardIds
@@ -78,21 +140,46 @@ export function playCombatCard(state: GameState, card: CardDefinition): GameStat
   const combat = next.currentCombat
   if (!combat) return next
   const actionCost = getCardActionCost(card)
-  if (combat.actionPoints < actionCost) { combat.log.push(`行动点不足，无法施展${card.name}。`); return next }
+  const actionPoints = getCombatActionPoints(combat)
+  if (actionPoints < actionCost) { combat.log.push(`行动点不足，无法施展${card.name}。`); return next }
   if (next.player.stats.innerPower < card.costInnerPower) { combat.log.push('内力不足。'); return next }
   const enemy = enemyById[combat.enemyId]
   if (!enemy) return next
+  const cardTactic = getCardTactic(card)
+  const enemyIntent = getCurrentEnemyIntent(combat, enemy)
+  const enemyTactic = fallbackEnemyTactic(enemyIntent)
+  const matchup = getTacticMatchup(cardTactic, enemyTactic)
   next.player.stats.innerPower -= card.costInnerPower
-  combat.actionPoints -= actionCost
+  combat.actionPoints = actionPoints - actionCost
   combat.drawnCardIds = removeOneCardId(combat.drawnCardIds, card.id)
   combat.actionTaken = true
   for (const effect of card.effects) {
-    if (effect.type === 'damage') { const attackBonus = getEquippedStatBonus(next, 'attack'); const damage = Math.max(0, effect.amount + attackBonus - combat.enemyBlock); combat.enemyHp = Math.max(0, combat.enemyHp - damage); const bonusText = attackBonus > 0 ? `（${describeEquipmentPrepBonus(next, 'attack')}）` : ''; combat.log.push(`${card.name} 造成 ${damage} 点伤害。${bonusText}`); setCombatMoment(combat, { type: 'enemy_hit', text: `${card.name}命中${enemy.name}，造成 ${damage} 点伤害。${bonusText}` }) }
-    if (effect.type === 'block') { const block = effect.amount + getEquippedStatBonus(next, 'defense'); combat.playerBlock += block; combat.log.push(`${card.name} 获得 ${block} 点格挡。`); setCombatMoment(combat, { type: 'guard', text: `${card.name}护住周身，获得 ${block} 点格挡。` }) }
+    if (effect.type === 'damage') {
+      const attackBonus = getEquippedStatBonus(next, 'attack')
+      const tacticDamage = matchup === 'advantage' ? 3 : matchup === 'disadvantage' ? -3 : 0
+      const damage = Math.max(0, effect.amount + attackBonus + tacticDamage - combat.enemyBlock)
+      combat.enemyHp = Math.max(0, combat.enemyHp - damage)
+      const bonusText = attackBonus > 0 ? `（${describeEquipmentPrepBonus(next, 'attack')}）` : ''
+      combat.log.push(`${card.name} 造成 ${damage} 点伤害。${bonusText}`)
+      if (matchup === 'disadvantage') combat.log.push(`${card.name}打在${enemyTacticLabel(enemyTactic)}上，伤害降低。`)
+      if (matchup === 'advantage') combat.log.push(`${card.name}克制${enemyTacticLabel(enemyTactic)}，伤势更重。`)
+      setCombatMoment(combat, { type: 'enemy_hit', text: `${card.name}命中${enemy.name}，造成 ${damage} 点伤害。${bonusText}` })
+    }
+    if (effect.type === 'block') {
+      const tacticBlockBonus = matchup === 'advantage' && (cardTactic === 'guard' || cardTactic === 'movement') ? 3 : 0
+      const block = effect.amount + getEquippedStatBonus(next, 'defense') + tacticBlockBonus
+      combat.playerBlock += block
+      combat.log.push(`${card.name} 获得 ${block} 点格挡。`)
+      setCombatMoment(combat, { type: 'guard', text: `${card.name}护住周身，获得 ${block} 点格挡。` })
+    }
     if (effect.type === 'heal') { const beforeHp = next.player.stats.hp; next.player.stats.hp = Math.min(next.player.stats.maxHp, next.player.stats.hp + effect.amount); const healed = next.player.stats.hp - beforeHp; combat.log.push(`${card.name} 恢复 ${effect.amount} 点气血。`); setCombatMoment(combat, { type: 'heal', text: `${card.name}为你治疗 ${healed} 点气血。` }) }
     if (effect.type === 'gain_inner_power') { next.player.stats.innerPower = Math.min(next.player.stats.maxInnerPower, next.player.stats.innerPower + effect.amount); combat.log.push(`${card.name} 恢复 ${effect.amount} 点内力。`) }
     if (effect.type === 'apply_status') { combat.enemyStatuses.push({ id: effect.status, amount: effect.amount }); combat.log.push(`${card.name} 施加 ${effect.status}。`); setCombatMoment(combat, { type: effect.status === 'poison' ? 'poison' : 'status', text: `${enemy.name}身中${describeStatusName(effect.status)} ${effect.amount} 层。` }) }
     if (effect.type === 'gain_demon_heart') next.player.stats.demonHeart += effect.amount
+  }
+  if (cardTactic === 'break' && matchup === 'advantage') {
+    addStatus(combat.enemyStatuses, 'vulnerable', 1)
+    combat.log.push(`${card.name}破开${enemyTacticLabel(enemyTactic)}，敌人露出破绽。`)
   }
   if (combat.enemyHp <= 0) { combat.result = 'victory'; combat.log.push('你赢得了战斗。'); return next }
   return next

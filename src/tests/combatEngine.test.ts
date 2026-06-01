@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { describeEnemyIntent, playCombatCard, startCombat } from '../engine/combatEngine'
+import { describeEnemyIntent, getTacticMatchup, playCombatCard, startCombat } from '../engine/combatEngine'
 import { equipEquipmentCard } from '../engine/equipmentEngine'
 import { cardById } from '../data/cards'
 import { enemyById } from '../data/enemies'
@@ -25,6 +25,46 @@ describe('combatEngine', () => {
     expect(result.currentCombat?.drawnCardIds.filter((id) => id === 'basic_slash')).toHaveLength(
       state.currentCombat!.drawnCardIds.filter((id) => id === 'basic_slash').length - 1,
     )
+  })
+
+  it('reports tactical advantage for movement against assault', () => {
+    expect(getTacticMatchup('movement', 'assault')).toBe('advantage')
+  })
+
+  it('reduces attack damage against a guarding enemy tactic', () => {
+    const state = startCombat(makeState(), enemyById.bandit)
+    const guarding = {
+      ...state,
+      currentCombat: {
+        ...state.currentCombat!,
+        enemyHp: 28,
+        enemyBlock: 0,
+        enemyIntentOverride: { type: 'guard' as const, amount: 0, tactic: 'guard' as const },
+      },
+    }
+
+    const result = playCombatCard(guarding, cardById.basic_slash)
+
+    expect(result.currentCombat?.enemyHp).toBe(25)
+    expect(result.currentCombat?.log.at(-1)).toContain('劈风斩打在守势上，伤害降低')
+  })
+
+  it('break tactics expose charging enemies to vulnerable', () => {
+    const state = startCombat(makeState(), enemyById.black_market_master)
+    const charging = {
+      ...state,
+      currentCombat: {
+        ...state.currentCombat!,
+        enemyStatuses: [],
+        drawnCardIds: ['qingshuang_sword'],
+        enemyIntentOverride: { type: 'guard' as const, amount: 0, tactic: 'charge' as const },
+      },
+    }
+
+    const result = playCombatCard(charging, cardById.qingshuang_sword)
+
+    expect(result.currentCombat?.enemyStatuses).toContainEqual({ id: 'vulnerable', amount: 1 })
+    expect(result.currentCombat?.log.join('\n')).toContain('青霜一剑破开蓄势，敌人露出破绽。')
   })
 
   it('starts combat and plays a card', () => {

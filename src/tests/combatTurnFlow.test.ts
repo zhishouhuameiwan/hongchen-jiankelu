@@ -5,19 +5,21 @@ import { enemyById } from '../data/enemies'
 import { makeState } from './helpers'
 
 describe('combat turn flow', () => {
-  it('allows only one card action before the turn advances', () => {
+  it('spends action points across multiple card actions before the turn advances', () => {
     const enemy = enemyById.bandit
     const state = startCombat(makeState(), enemy)
     const afterFirst = playCombatCard(state, cardById.basic_slash)
     const afterSecond = playCombatCard(afterFirst, cardById.basic_guard)
 
     expect(afterFirst.currentCombat?.actionTaken).toBe(true)
+    expect(afterFirst.currentCombat?.actionPoints).toBe(2)
     expect(afterSecond.currentCombat?.turn).toBe(1)
-    expect(afterSecond.currentCombat?.playerBlock).toBe(0)
-    expect(afterSecond.currentCombat?.log.at(-1)).toBe('本回合已行动。')
+    expect(afterSecond.currentCombat?.actionPoints).toBe(1)
+    expect(afterSecond.currentCombat?.playerBlock).toBe(9)
 
     const afterEndTurn = endPlayerTurn(afterSecond, enemy)
     expect(afterEndTurn.currentCombat?.turn).toBe(2)
+    expect(afterEndTurn.currentCombat?.actionPoints).toBe(3)
     expect(afterEndTurn.currentCombat?.actionTaken).toBe(false)
   })
 
