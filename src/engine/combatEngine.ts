@@ -27,9 +27,14 @@ function getCombatPrepBonuses(state: GameState): CombatPrepBonus[] {
 }
 
 function applyOpeningFoodBonus(state: GameState): GameState {
-  if ((state.itemBag.steamed_bun ?? 0) <= 0) return state
+  const bunCount = state.itemBag.steamed_bun ?? 0
+  if (bunCount <= 0) return state
+  const itemBag = { ...state.itemBag }
+  if (bunCount > 1) itemBag.steamed_bun = bunCount - 1
+  else delete itemBag.steamed_bun
   return {
     ...state,
+    itemBag,
     player: {
       ...state.player,
       stats: {

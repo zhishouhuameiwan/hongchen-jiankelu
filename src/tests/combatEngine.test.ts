@@ -151,7 +151,7 @@ describe('combatEngine', () => {
     expect(next.currentCombat?.lastMoment?.text).toContain('粗铁剑备战：攻击 +2')
   })
 
-  it('uses steamed bun fullness as the next combat opening recovery bonus', () => {
+  it('uses steamed bun fullness as the next combat opening recovery bonus and consumes it', () => {
     const enemy = enemyById.bandit
     const rested = {
       ...makeState(),
@@ -163,7 +163,20 @@ describe('combatEngine', () => {
 
     expect(afterMeal.player.stats.hp).toBe(44)
     expect(afterMeal.player.stats.innerPower).toBe(2)
+    expect(afterMeal.itemBag.steamed_bun).toBeUndefined()
     expect(afterMeal.currentCombat?.log[0]).toContain('蒸饼备战：开战恢复 4 点气血与 1 点内力')
+  })
+
+  it('keeps remaining steamed buns after consuming one opening combat bonus', () => {
+    const enemy = enemyById.bandit
+    const rested = {
+      ...makeState(),
+      itemBag: { steamed_bun: 2 },
+      log: [],
+    }
+    const afterMeal = startCombat(rested, enemy)
+
+    expect(afterMeal.itemBag.steamed_bun).toBe(1)
   })
 
   it('describes enemy intent for the current turn', () => {
