@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { starterDeck } from '../data/cards'
 import type { Choice, EquipmentSlot, GameState, LocationId } from '../types/game'
 import { applyChoice } from '../engine/eventEngine'
-import { useItem } from '../engine/itemEngine'
+import { consumeItem } from '../engine/itemEngine'
 import { cookRecipe } from '../engine/cookingEngine'
 import { advancePhase } from '../engine/dayPhaseEngine'
 import { CURRENT_SAVE_VERSION, clearSave, hasSavedGame, loadGame, saveGame } from '../engine/saveEngine'
@@ -102,7 +102,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
   equipCard: (cardId) => { const state = get().state; if (state) set({ state: persist(equipEquipmentCard(state, cardId)) }) },
   unequipSlot: (slot) => { const state = get().state; if (state) set({ state: persist(unequipEquipmentCard(state, slot)) }) },
-  useItem: (itemId) => { const state = get().state; if (state) set({ state: persist(useItem(state, itemId)) }) },
+  useItem: (itemId) => { const state = get().state; if (state) set({ state: persist(consumeItem(state, itemId)) }) },
   cookRecipe: (recipeId) => { const state = get().state; if (state) set({ state: persist(cookRecipe(state, recipeId)) }) },
   endTurn: () => { const state = get().state; if (!state?.currentCombat || state.currentCombat.result) return; set({ state: persist(endPlayerTurn(state, enemyById[state.currentCombat.enemyId])) }) },
   finishCombat: (rewardCardId) => {
@@ -114,8 +114,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const chapterOneBossVictory = enemy.id === 'ch1_black_market_boss'
       const chapterOneFlags = chapterOneBossVictory ? ['ch1_black_market_boss_defeated', 'blood_river_fragment_found'] : []
       const chapterOneLogs = chapterOneBossVictory ? ['第一章完成：你击败黑市小头目，夺回血河经残页。'] : []
-      const gainLogs = [`战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`, ...(gainedNewCard ? [`新卡入库：${cardById[rewardCard]?.name ?? rewardCard}。去卡组查看。`] : []), '获得物品：小还丹。', ...chapterOneLogs]
-      const nextFlags = [...state.flags, ...chapterOneFlags.filter((flag) => !state.flags.includes(flag))]
+      const chapterThreeRemnantVictory = state.currentEventId === 'ch3_forest_blood_river_remnant_01'
+      const chapterThreeFlags = chapterThreeRemnantVictory ? ['ch3_blood_river_remnant_defeated', 'blood_river_complete_scroll_found'] : []
+      const chapterThreeLogs = chapterThreeRemnantVictory ? ['第三章完成：你截断血河余党，夺回完整残卷。'] : []
+      const seenEventFlag = state.currentEventId ? `seen_${state.currentEventId}` : undefined
+      const combatProgressFlags = [...chapterOneFlags, ...chapterThreeFlags, ...(seenEventFlag ? [seenEventFlag] : [])]
+      const gainLogs = [`战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`, ...(gainedNewCard ? [`新卡入库：${cardById[rewardCard]?.name ?? rewardCard}。去卡组查看。`] : []), '获得物品：小还丹。', ...chapterOneLogs, ...chapterThreeLogs]
+      const nextFlags = [...state.flags, ...combatProgressFlags.filter((flag) => !state.flags.includes(flag))]
       const next = { ...state, screen: 'map' as const, currentCombat: undefined, currentEventId: undefined, currentLocationId: undefined, flags: nextFlags, deck: gainedNewCard ? [...state.deck, rewardCard] : state.deck, itemBag: { ...state.itemBag, small_healing_pill: (state.itemBag.small_healing_pill ?? 0) + 1 }, player: { ...state.player, silver: state.player.silver + enemy.rewardSilver }, log: [...state.log, ...gainLogs] }
       set({ state: persist(advancePhase(next)) })
     } else {

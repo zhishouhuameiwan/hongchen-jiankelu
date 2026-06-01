@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { gainItem, useItem } from '../engine/itemEngine'
+import { gainItem, consumeItem } from '../engine/itemEngine'
 import { makeState } from './helpers'
 
 describe('itemEngine', () => {
@@ -17,7 +17,7 @@ describe('itemEngine', () => {
       player: { ...makeState().player, stats: { ...makeState().player.stats, hp: 45 } },
     }
 
-    const next = useItem(wounded, 'small_healing_pill')
+    const next = consumeItem(wounded, 'small_healing_pill')
 
     expect(next.player.stats.hp).toBe(57)
     expect(next.itemBag.small_healing_pill).toBe(1)
@@ -31,8 +31,8 @@ describe('itemEngine', () => {
       player: { ...makeState().player, stats: { ...makeState().player.stats, innerPower: 2 } },
     }
 
-    const afterFood = useItem(state, 'dry_ration')
-    const afterPowder = useItem(afterFood, 'qi_recovery_powder')
+    const afterFood = consumeItem(state, 'dry_ration')
+    const afterPowder = consumeItem(afterFood, 'qi_recovery_powder')
 
     expect(afterFood.stamina).toBe(6)
     expect(afterPowder.player.stats.innerPower).toBe(3)

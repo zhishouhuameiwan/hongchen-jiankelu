@@ -17,7 +17,7 @@ export function gainItem(state: GameState, itemId: string, amount = 1): GameStat
   return { ...state, itemBag: { ...state.itemBag, [itemId]: (state.itemBag[itemId] ?? 0) + amount } }
 }
 
-export function useItem(state: GameState, itemId: string): GameState {
+export function consumeItem(state: GameState, itemId: string): GameState {
   const item = itemById[itemId]
   const count = state.itemBag[itemId] ?? 0
   if (!item || !['consumable', 'food'].includes(item.category) || count <= 0) return state

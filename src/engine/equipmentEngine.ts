@@ -36,8 +36,9 @@ export function unequipEquipmentCard(state: GameState, slot: EquipmentSlot): Gam
   const next: GameState = structuredClone(state)
   const cardId = next.equipment?.[slot]
   if (!cardId) return next
-  const { [slot]: _removed, ...equipment } = next.equipment
-  next.equipment = equipment
+  const nextEquipment = { ...next.equipment }
+  delete nextEquipment[slot]
+  next.equipment = nextEquipment
   next.log = [...next.log, `卸下：${cardById[cardId]?.name ?? cardId}。`]
   return next
 }

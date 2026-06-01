@@ -3,6 +3,7 @@ import { locationById } from '../data/world'
 import { createInitialGameState, useGameStore } from '../store/gameStore'
 import type { Choice } from '../types/game'
 import { startCombat } from '../engine/combatEngine'
+import { getCurrentGoal } from '../engine/goalEngine'
 import { enemyById } from '../data/enemies'
 
 describe('gameStore menu flow', () => {
@@ -102,6 +103,53 @@ describe('gameStore combat flow', () => {
     expect(afterTurn.currentCombat?.actionPoints).toBe(3)
     expect(afterTurn.currentCombat?.actionTaken).toBe(false)
     expect(afterTurn.currentCombat?.log).toContain('山道劫匪 攻击，造成 6 点伤害。')
+  })
+
+  it('marks chapter three remnant combat complete only after claiming the victory reward', () => {
+    const store = useGameStore.getState()
+    store.clearSavedGame()
+    const base = createInitialGameState('测试侠客', 'wandering_swordsman')
+    useGameStore.setState({
+      state: {
+        ...base,
+        flags: [
+          'ch1_black_market_boss_defeated',
+          'blood_river_fragment_found',
+          'ch2_teahouse_source_found',
+          'ch2_forest_corruption_seen',
+          'blood_altar_disrupted',
+          'ch3_town_blood_jade_traced',
+        ],
+        screen: 'combat',
+        currentEventId: 'ch3_forest_blood_river_remnant_01',
+        currentLocationId: 'forest',
+        currentCombat: {
+          enemyId: 'blood_river_puppet',
+          enemyHp: 0,
+          playerBlock: 0,
+          enemyBlock: 0,
+          turn: 5,
+          actionPoints: 3,
+          drawnCardIds: ['basic_slash'],
+          playerStatuses: [],
+          enemyStatuses: [],
+          log: ['你赢得了战斗。'],
+          result: 'victory',
+        },
+      },
+      setupScreen: 'menu',
+    })
+
+    store.finishCombat('blood_river_strike')
+
+    const next = useGameStore.getState().state!
+    expect(next.flags).toContain('ch3_blood_river_remnant_defeated')
+    expect(next.flags).toContain('blood_river_complete_scroll_found')
+    expect(next.flags).toContain('seen_ch3_forest_blood_river_remnant_01')
+    expect(next.currentEventId).toBeUndefined()
+    expect(next.currentLocationId).toBeUndefined()
+    expect(getCurrentGoal(next)).toBe('终局：去茶馆作出血河经最终抉择。')
+    expect(next.log).toContain('第三章完成：你截断血河余党，夺回完整残卷。')
   })
 })
 

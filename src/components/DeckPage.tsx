@@ -19,7 +19,7 @@ export function DeckPage() {
   const go = useGameStore((s) => s.go)
   const equipCard = useGameStore((s) => s.equipCard)
   const unequipSlot = useGameStore((s) => s.unequipSlot)
-  const useBagItem = useGameStore((s) => s.useItem)
+  const consumeBagItem = useGameStore((s) => s.useItem)
   const cookBagRecipe = useGameStore((s) => s.cookRecipe)
   const groupedDeck = state.deck.reduce<Record<string, string[]>>((groups, id) => {
     const label = getDeckGroupLabel(cardById[id].source)
@@ -63,7 +63,7 @@ export function DeckPage() {
                   <h3>{item.name} ×{count}</h3>
                   <p>{item.description}</p>
                   <small>{categoryLabel} · {item.source}</small>
-                  {usable ? <button onClick={() => useBagItem(id)}>{item.category === 'food' ? '食用' : '使用'}{item.name}</button> : <button disabled>不可使用</button>}
+                  {usable ? <button onClick={() => consumeBagItem(id)}>{item.category === 'food' ? '食用' : '使用'}{item.name}</button> : <button disabled>不可使用</button>}
                 </article>
               )
             })}

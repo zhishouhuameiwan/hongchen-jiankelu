@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { cookRecipe, getCookingLevel, getKnownRecipes, learnRecipe } from '../engine/cookingEngine'
-import { gainItem, useItem } from '../engine/itemEngine'
+import { gainItem, consumeItem } from '../engine/itemEngine'
 import { itemById } from '../data/items'
 import { makeState } from './helpers'
 
@@ -40,7 +40,7 @@ describe('cookingEngine', () => {
   it('makes food edible through the item engine and removes the final stack', () => {
     const hungry = { ...gainItem(makeState(), 'steamed_bun'), stamina: 4 }
 
-    const next = useItem(hungry, 'steamed_bun')
+    const next = consumeItem(hungry, 'steamed_bun')
 
     expect(next.stamina).toBe(5)
     expect(next.itemBag.steamed_bun).toBeUndefined()
