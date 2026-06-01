@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { describeEnemyIntent, getTacticMatchup, playCombatCard, startCombat } from '../engine/combatEngine'
+import { describeEnemyIntent, endPlayerTurn, getTacticMatchup, playCombatCard, startCombat } from '../engine/combatEngine'
 import { equipEquipmentCard } from '../engine/equipmentEngine'
 import { cardById } from '../data/cards'
 import { enemyById } from '../data/enemies'
@@ -65,6 +65,72 @@ describe('combatEngine', () => {
 
     expect(result.currentCombat?.enemyStatuses).toContainEqual({ id: 'vulnerable', amount: 1 })
     expect(result.currentCombat?.log.join('\n')).toContain('青霜一剑破开蓄势，敌人露出破绽。')
+  })
+
+  it('vulnerable makes the next player hit deal extra damage and then wears off', () => {
+    const state = startCombat(makeState(), enemyById.bandit)
+    const exposed = {
+      ...state,
+      currentCombat: {
+        ...state.currentCombat!,
+        enemyHp: 28,
+        enemyStatuses: [{ id: 'vulnerable', amount: 1 }],
+      },
+    }
+
+    const result = playCombatCard(exposed, cardById.basic_slash)
+
+    expect(result.currentCombat?.enemyHp).toBe(18)
+    expect(result.currentCombat?.enemyStatuses).not.toContainEqual({ id: 'vulnerable', amount: 1 })
+    expect(result.currentCombat?.log.join('\n')).toContain('破绽')
+  })
+
+  it('bleed and poison damage the enemy at the end of the player turn', () => {
+    const state = startCombat(makeState(), enemyById.bandit)
+    const afflicted = {
+      ...state,
+      currentCombat: {
+        ...state.currentCombat!,
+        enemyHp: 28,
+        enemyStatuses: [
+          { id: 'bleed', amount: 2 },
+          { id: 'poison', amount: 3 },
+        ],
+      },
+    }
+
+    const result = endPlayerTurn(afflicted, enemyById.bandit)
+
+    expect(result.currentCombat?.enemyHp).toBe(23)
+    expect(result.currentCombat?.enemyStatuses).toContainEqual({ id: 'bleed', amount: 1 })
+    expect(result.currentCombat?.enemyStatuses).toContainEqual({ id: 'poison', amount: 2 })
+    expect(result.currentCombat?.log.join('\n')).toContain('流血')
+    expect(result.currentCombat?.log.join('\n')).toContain('中毒')
+  })
+
+  it('sealed weakens the next enemy action and counter retaliates when hit', () => {
+    const state = startCombat(makeState(), enemyById.bandit)
+    const prepared = {
+      ...state,
+      currentCombat: {
+        ...state.currentCombat!,
+        playerBlock: 0,
+        playerStatuses: [
+          { id: 'sealed', amount: 1 },
+          { id: 'counter', amount: 1 },
+        ],
+        enemyHp: 28,
+      },
+    }
+
+    const result = endPlayerTurn(prepared, enemyById.bandit)
+
+    expect(result.player.stats.hp).toBe(makeState().player.stats.hp - 4)
+    expect(result.currentCombat?.enemyHp).toBe(25)
+    expect(result.currentCombat?.playerStatuses).not.toContainEqual({ id: 'sealed', amount: 1 })
+    expect(result.currentCombat?.playerStatuses).not.toContainEqual({ id: 'counter', amount: 1 })
+    expect(result.currentCombat?.log.join('\n')).toContain('封脉')
+    expect(result.currentCombat?.log.join('\n')).toContain('反击')
   })
 
   it('starts combat and plays a card', () => {

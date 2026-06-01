@@ -125,6 +125,40 @@ function addStatus(statuses: { id: string; amount: number }[], id: string, amoun
   else statuses.push({ id, amount })
 }
 
+function getStatusAmount(statuses: { id: string; amount: number }[], id: string): number {
+  return statuses.find((status) => status.id === id)?.amount ?? 0
+}
+
+function reduceStatus(statuses: { id: string; amount: number }[], id: string, amount: number): void {
+  const existing = statuses.find((status) => status.id === id)
+  if (!existing) return
+  existing.amount -= amount
+  if (existing.amount <= 0) statuses.splice(statuses.indexOf(existing), 1)
+}
+
+function tickDamageStatus(
+  combat: NonNullable<GameState['currentCombat']>,
+  side: 'enemy' | 'player',
+  id: 'bleed' | 'poison',
+  applyDamage: (amount: number) => void,
+): void {
+  const statuses = side === 'enemy' ? combat.enemyStatuses : combat.playerStatuses
+  const amount = getStatusAmount(statuses, id)
+  if (amount <= 0) return
+  applyDamage(amount)
+  combat.log.push(`${side === 'enemy' ? '敌人' : '你'}受到${describeStatusName(id)} ${amount} 点伤害。`)
+  reduceStatus(statuses, id, 1)
+}
+
+function applyEndOfTurnStatuses(next: GameState): void {
+  const combat = next.currentCombat
+  if (!combat) return
+  tickDamageStatus(combat, 'enemy', 'bleed', (amount) => { combat.enemyHp = Math.max(0, combat.enemyHp - amount) })
+  tickDamageStatus(combat, 'enemy', 'poison', (amount) => { combat.enemyHp = Math.max(0, combat.enemyHp - amount) })
+  tickDamageStatus(combat, 'player', 'bleed', (amount) => { next.player.stats.hp = Math.max(0, next.player.stats.hp - amount) })
+  tickDamageStatus(combat, 'player', 'poison', (amount) => { next.player.stats.hp = Math.max(0, next.player.stats.hp - amount) })
+}
+
 function getCombatActionPoints(combat: NonNullable<GameState['currentCombat']>): number {
   return combat.actionPoints ?? 3
 }
@@ -157,8 +191,13 @@ export function playCombatCard(state: GameState, card: CardDefinition): GameStat
     if (effect.type === 'damage') {
       const attackBonus = getEquippedStatBonus(next, 'attack')
       const tacticDamage = matchup === 'advantage' ? 3 : matchup === 'disadvantage' ? -3 : 0
-      const damage = Math.max(0, effect.amount + attackBonus + tacticDamage - combat.enemyBlock)
+      const vulnerableBonus = getStatusAmount(combat.enemyStatuses, 'vulnerable') > 0 ? 4 : 0
+      const damage = Math.max(0, effect.amount + attackBonus + tacticDamage + vulnerableBonus - combat.enemyBlock)
       combat.enemyHp = Math.max(0, combat.enemyHp - damage)
+      if (vulnerableBonus > 0) {
+        combat.log.push(`${enemy.name}露出破绽，额外承受 ${vulnerableBonus} 点伤害。`)
+        reduceStatus(combat.enemyStatuses, 'vulnerable', 1)
+      }
       const bonusText = attackBonus > 0 ? `（${describeEquipmentPrepBonus(next, 'attack')}）` : ''
       combat.log.push(`${card.name} 造成 ${damage} 点伤害。${bonusText}`)
       if (matchup === 'disadvantage') combat.log.push(`${card.name}打在${enemyTacticLabel(enemyTactic)}上，伤害降低。`)
@@ -187,6 +226,7 @@ export function playCombatCard(state: GameState, card: CardDefinition): GameStat
 
 export function endPlayerTurn(state: GameState, enemy: EnemyDefinition): GameState {
   const next = resolveEnemyTurn(state, enemy)
+  applyEndOfTurnStatuses(next)
   if (!next.currentCombat) return next
   if (next.player.stats.hp <= 0) { next.currentCombat.result = 'defeat'; next.currentCombat.log.push('你败下阵来。'); return next }
   next.currentCombat.turn += 1
@@ -202,8 +242,25 @@ export function resolveEnemyTurn(state: GameState, enemy: EnemyDefinition): Game
   const next: GameState = structuredClone(state)
   const combat = next.currentCombat
   if (!combat) return next
-  const intent = enemy.intents[(combat.turn - 1) % enemy.intents.length]
-  if (intent.type === 'attack') { const damage = Math.max(0, intent.amount - combat.playerBlock - getEquippedStatBonus(next, 'defense')); next.player.stats.hp = Math.max(0, next.player.stats.hp - damage); combat.log.push(`${enemy.name} 攻击，造成 ${damage} 点伤害。`); setCombatMoment(combat, { type: 'player_hit', text: `${enemy.name}击中你，造成 ${damage} 点伤害。` }) }
+  const intent = combat.enemyIntentOverride ?? enemy.intents[(combat.turn - 1) % enemy.intents.length]
+  if (intent.type === 'attack') {
+    const sealedAmount = getStatusAmount(combat.playerStatuses, 'sealed')
+    const sealedReduction = sealedAmount > 0 ? 2 : 0
+    if (sealedReduction > 0) {
+      combat.log.push(`封脉压住经络，${enemy.name}攻势减弱 ${sealedReduction} 点。`)
+      reduceStatus(combat.playerStatuses, 'sealed', 1)
+    }
+    const damage = Math.max(0, intent.amount - sealedReduction - combat.playerBlock - getEquippedStatBonus(next, 'defense'))
+    next.player.stats.hp = Math.max(0, next.player.stats.hp - damage)
+    combat.log.push(`${enemy.name} 攻击，造成 ${damage} 点伤害。`)
+    if (damage > 0 && getStatusAmount(combat.playerStatuses, 'counter') > 0) {
+      const counterDamage = 3
+      combat.enemyHp = Math.max(0, combat.enemyHp - counterDamage)
+      combat.log.push(`你借势反击，造成 ${counterDamage} 点伤害。`)
+      reduceStatus(combat.playerStatuses, 'counter', 1)
+    }
+    setCombatMoment(combat, { type: 'player_hit', text: `${enemy.name}击中你，造成 ${damage} 点伤害。` })
+  }
   if (intent.type === 'guard') { combat.enemyBlock += intent.amount; combat.log.push(`${enemy.name} 转为守势。`); setCombatMoment(combat, { type: 'guard', text: `${enemy.name}转为守势，获得 ${intent.amount} 点格挡。` }) }
   if (intent.type === 'apply_status') { combat.playerStatuses.push({ id: intent.status, amount: intent.amount }); combat.log.push(`${enemy.name} 施加 ${intent.status}。`); setCombatMoment(combat, { type: intent.status === 'poison' ? 'poison' : 'status', text: `你身中${describeStatusName(intent.status)} ${intent.amount} 层。` }) }
   return next
