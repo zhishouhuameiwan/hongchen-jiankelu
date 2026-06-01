@@ -13,7 +13,7 @@ export function startCombat(state: GameState, enemy: EnemyDefinition): GameState
   const prepBonuses = getCombatPrepBonuses(state)
   const afterOpeningFood = applyOpeningFoodBonus(state)
   const openingLogs = prepBonuses.map((bonus) => bonus.text)
-  return { ...afterOpeningFood, screen: 'combat', currentCombat: { enemyId: enemy.id, enemyHp: enemy.maxHp, playerBlock: 0, enemyBlock: 0, turn: 1, drawnCardIds: drawCardIds(state.deck, 3), playerStatuses: [], enemyStatuses: [], prepBonuses, log: [...openingLogs, `${enemy.name} 拦住了你的去路。`], lastMoment: prepBonuses.length ? { type: 'prep', text: prepBonuses.map((bonus) => bonus.text).join('；') } : undefined, actionTaken: false } }
+  return { ...afterOpeningFood, screen: 'combat', currentCombat: { enemyId: enemy.id, enemyHp: enemy.maxHp, playerBlock: 0, enemyBlock: 0, turn: 1, actionPoints: 3, drawnCardIds: drawCardIds(state.deck, 4), playerStatuses: [], enemyStatuses: [], prepBonuses, log: [...openingLogs, `${enemy.name} 拦住了你的去路。`], lastMoment: prepBonuses.length ? { type: 'prep', text: prepBonuses.map((bonus) => bonus.text).join('；') } : undefined, actionTaken: false } }
 }
 
 function getCombatPrepBonuses(state: GameState): CombatPrepBonus[] {
@@ -63,15 +63,28 @@ function describeEquipmentPrepBonus(state: GameState, stat: 'attack' | 'defense'
   return card && bonus ? `${card.name}备战：${stat === 'attack' ? '攻击' : '防御'} +${bonus.value}` : ''
 }
 
+export function getCardActionCost(card: CardDefinition): number {
+  return card.costAction ?? 1
+}
+
+function removeOneCardId(cardIds: string[], cardId: string): string[] {
+  const index = cardIds.indexOf(cardId)
+  if (index === -1) return cardIds
+  return [...cardIds.slice(0, index), ...cardIds.slice(index + 1)]
+}
+
 export function playCombatCard(state: GameState, card: CardDefinition): GameState {
   const next: GameState = structuredClone(state)
   const combat = next.currentCombat
   if (!combat) return next
-  if (combat.actionTaken) { combat.log.push('本回合已行动。'); return next }
+  const actionCost = getCardActionCost(card)
+  if (combat.actionPoints < actionCost) { combat.log.push(`行动点不足，无法施展${card.name}。`); return next }
   if (next.player.stats.innerPower < card.costInnerPower) { combat.log.push('内力不足。'); return next }
   const enemy = enemyById[combat.enemyId]
   if (!enemy) return next
   next.player.stats.innerPower -= card.costInnerPower
+  combat.actionPoints -= actionCost
+  combat.drawnCardIds = removeOneCardId(combat.drawnCardIds, card.id)
   combat.actionTaken = true
   for (const effect of card.effects) {
     if (effect.type === 'damage') { const attackBonus = getEquippedStatBonus(next, 'attack'); const damage = Math.max(0, effect.amount + attackBonus - combat.enemyBlock); combat.enemyHp = Math.max(0, combat.enemyHp - damage); const bonusText = attackBonus > 0 ? `（${describeEquipmentPrepBonus(next, 'attack')}）` : ''; combat.log.push(`${card.name} 造成 ${damage} 点伤害。${bonusText}`); setCombatMoment(combat, { type: 'enemy_hit', text: `${card.name}命中${enemy.name}，造成 ${damage} 点伤害。${bonusText}` }) }
@@ -92,7 +105,8 @@ export function endPlayerTurn(state: GameState, enemy: EnemyDefinition): GameSta
   next.currentCombat.turn += 1
   next.currentCombat.playerBlock = 0
   next.currentCombat.enemyBlock = 0
-  next.currentCombat.drawnCardIds = drawCardIds(next.deck, 3)
+  next.currentCombat.drawnCardIds = drawCardIds(next.deck, 4)
+  next.currentCombat.actionPoints = 3
   next.currentCombat.actionTaken = false
   return next
 }

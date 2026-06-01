@@ -81,7 +81,7 @@ describe('gameStore exploration flow', () => {
 })
 
 describe('gameStore combat flow', () => {
-  it('automatically ends the player turn after playing one card', () => {
+  it('keeps the player turn open after playing one card until explicitly ending the turn', () => {
     const store = useGameStore.getState()
     store.clearSavedGame()
     const combatState = startCombat(createInitialGameState('测试侠客', 'wandering_swordsman'), enemyById.bandit)
@@ -89,10 +89,19 @@ describe('gameStore combat flow', () => {
 
     store.playCard('basic_slash')
 
-    const state = useGameStore.getState().state!
-    expect(state.currentCombat?.turn).toBe(2)
-    expect(state.currentCombat?.actionTaken).toBe(false)
-    expect(state.currentCombat?.log).toContain('山道劫匪 攻击，造成 6 点伤害。')
+    const afterCard = useGameStore.getState().state!
+    expect(afterCard.currentCombat?.turn).toBe(1)
+    expect(afterCard.currentCombat?.actionPoints).toBe(2)
+    expect(afterCard.currentCombat?.actionTaken).toBe(true)
+    expect(afterCard.currentCombat?.log).not.toContain('山道劫匪 攻击，造成 6 点伤害。')
+
+    store.endTurn()
+
+    const afterTurn = useGameStore.getState().state!
+    expect(afterTurn.currentCombat?.turn).toBe(2)
+    expect(afterTurn.currentCombat?.actionPoints).toBe(3)
+    expect(afterTurn.currentCombat?.actionTaken).toBe(false)
+    expect(afterTurn.currentCombat?.log).toContain('山道劫匪 攻击，造成 6 点伤害。')
   })
 })
 

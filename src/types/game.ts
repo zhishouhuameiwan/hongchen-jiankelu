@@ -78,6 +78,8 @@ export type CookingRecipe = { id: string; name: string; outputItemId: string; in
 
 export type EquipmentSlot = 'weapon' | 'armor' | 'boots' | 'accessory'
 export type EquipmentBonus = { stat: Exclude<StatKey, 'silver'>; value: number }
+export type CombatTactic = 'attack' | 'guard' | 'movement' | 'break' | 'inner' | 'trick' | 'demonic' | 'romance'
+export type EnemyTactic = 'assault' | 'guard' | 'charge' | 'cast' | 'feint'
 export type CardType = 'attack' | 'defense' | 'inner' | 'movement' | 'trick' | 'romance' | 'demonic' | 'equipment'
 export type CardEffect =
   | { type: 'damage'; amount: number }
@@ -87,14 +89,14 @@ export type CardEffect =
   | { type: 'apply_status'; status: string; amount: number }
   | { type: 'draw'; amount: number }
   | { type: 'gain_demon_heart'; amount: number }
-export type CardDefinition = { id: string; name: string; type: CardType; costInnerPower: number; description: string; effects: CardEffect[]; source: string; equipmentSlot?: EquipmentSlot; bonuses?: EquipmentBonus[] }
+export type CardDefinition = { id: string; name: string; type: CardType; costInnerPower: number; costAction?: number; tactic?: CombatTactic; description: string; effects: CardEffect[]; source: string; equipmentSlot?: EquipmentSlot; bonuses?: EquipmentBonus[] }
 
-export type EnemyIntent = { type: 'attack'; amount: number } | { type: 'guard'; amount: number } | { type: 'apply_status'; status: string; amount: number }
+export type EnemyIntent = ({ type: 'attack'; amount: number } | { type: 'guard'; amount: number } | { type: 'apply_status'; status: string; amount: number }) & { tactic?: EnemyTactic }
 export type EnemyDefinition = { id: string; name: string; maxHp: number; attack: number; defense: number; intents: EnemyIntent[]; rewardCardPool: string[]; rewardSilver: number }
 export type CombatStatus = { id: string; amount: number }
 export type CombatMoment = { type: 'enemy_hit' | 'player_hit' | 'poison' | 'heal' | 'guard' | 'status' | 'prep'; text: string }
 export type CombatPrepBonus = { id: string; text: string }
-export type CombatState = { enemyId: string; enemyHp: number; playerBlock: number; enemyBlock: number; turn: number; drawnCardIds: string[]; playerStatuses: CombatStatus[]; enemyStatuses: CombatStatus[]; log: string[]; prepBonuses?: CombatPrepBonus[]; lastMoment?: CombatMoment; actionTaken?: boolean; result?: 'victory' | 'defeat' }
+export type CombatState = { enemyId: string; enemyHp: number; playerBlock: number; enemyBlock: number; turn: number; actionPoints: number; drawnCardIds: string[]; playerStatuses: CombatStatus[]; enemyStatuses: CombatStatus[]; log: string[]; prepBonuses?: CombatPrepBonus[]; lastMoment?: CombatMoment; actionTaken?: boolean; result?: 'victory' | 'defeat' }
 
 export type GameState = {
   screen: Screen

@@ -6,6 +6,27 @@ import { enemyById } from '../data/enemies'
 import { makeState } from './helpers'
 
 describe('combatEngine', () => {
+  it('starts combat with 3 action points and four drawn cards', () => {
+    const result = startCombat(makeState(), enemyById.bandit)
+
+    expect(result.currentCombat?.actionPoints).toBe(3)
+    expect(result.currentCombat?.drawnCardIds).toHaveLength(4)
+  })
+
+  it('playing a one-action card spends action points without ending the enemy turn', () => {
+    const state = startCombat(makeState(), enemyById.bandit)
+    const beforeTurn = state.currentCombat!.turn
+
+    const result = playCombatCard(state, cardById.basic_slash)
+
+    expect(result.currentCombat?.actionPoints).toBe(2)
+    expect(result.currentCombat?.turn).toBe(beforeTurn)
+    expect(result.currentCombat?.actionTaken).toBe(true)
+    expect(result.currentCombat?.drawnCardIds.filter((id) => id === 'basic_slash')).toHaveLength(
+      state.currentCombat!.drawnCardIds.filter((id) => id === 'basic_slash').length - 1,
+    )
+  })
+
   it('starts combat and plays a card', () => {
     const enemy = enemyById.bandit
     const state = startCombat(makeState(), enemy)

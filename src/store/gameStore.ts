@@ -96,10 +96,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   playCard: (cardId) => {
     const state = get().state
     if (!state?.currentCombat || state.currentCombat.result) return
-    const enemy = enemyById[state.currentCombat.enemyId]
     const afterCard = playCombatCard(state, cardById[cardId])
-    const shouldAutoEndTurn = !state.currentCombat.actionTaken && afterCard.currentCombat?.actionTaken && !afterCard.currentCombat.result
-    set({ state: persist(shouldAutoEndTurn ? endPlayerTurn(afterCard, enemy) : afterCard) })
+    set({ state: persist(afterCard) })
   },
   equipCard: (cardId) => { const state = get().state; if (state) set({ state: persist(equipEquipmentCard(state, cardId)) }) },
   unequipSlot: (slot) => { const state = get().state; if (state) set({ state: persist(unequipEquipmentCard(state, slot)) }) },

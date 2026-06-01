@@ -1,9 +1,9 @@
 import type { CardDefinition } from '../types/game'
 
 export const cards: CardDefinition[] = [
-  { id: 'basic_slash', name: '劈风斩', type: 'attack', costInnerPower: 0, description: '造成 6 点伤害。', effects: [{ type: 'damage', amount: 6 }], source: 'starter' },
-  { id: 'basic_guard', name: '横剑格挡', type: 'defense', costInnerPower: 0, description: '获得 6 点格挡。', effects: [{ type: 'block', amount: 6 }], source: 'starter' },
-  { id: 'basic_breath', name: '调息', type: 'inner', costInnerPower: 0, description: '恢复 2 点内力。', effects: [{ type: 'gain_inner_power', amount: 2 }], source: 'starter' },
+  { id: 'basic_slash', name: '劈风斩', type: 'attack', costInnerPower: 0, costAction: 1, tactic: 'attack', description: '造成 6 点伤害。', effects: [{ type: 'damage', amount: 6 }], source: 'starter' },
+  { id: 'basic_guard', name: '横剑格挡', type: 'defense', costInnerPower: 0, costAction: 1, tactic: 'guard', description: '获得 6 点格挡。', effects: [{ type: 'block', amount: 6 }], source: 'starter' },
+  { id: 'basic_breath', name: '调息', type: 'inner', costInnerPower: 0, costAction: 1, tactic: 'inner', description: '恢复 2 点内力。', effects: [{ type: 'gain_inner_power', amount: 2 }], source: 'starter' },
   { id: 'cloud_step', name: '流云步', type: 'movement', costInnerPower: 0, description: '获得 4 点格挡，抽 1 张牌。', effects: [{ type: 'block', amount: 4 }, { type: 'draw', amount: 1 }], source: 'town' },
   { id: 'iron_cloth', name: '铁布衫', type: 'defense', costInnerPower: 1, description: '获得 12 点格挡。', effects: [{ type: 'block', amount: 12 }], source: 'forest' },
   { id: 'qingshuang_sword', name: '青霜一剑', type: 'attack', costInnerPower: 1, description: '造成 10 点伤害。', effects: [{ type: 'damage', amount: 10 }], source: 'shen_qingshuang' },
