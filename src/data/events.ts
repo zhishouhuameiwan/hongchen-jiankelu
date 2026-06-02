@@ -34,7 +34,7 @@ export const events: GameEvent[] = [
     { id: 'rally', text: '请镇民协助封锁黑市去路', staminaCost: 1, effects: [{ type: 'set_flag', value: 'ch3_town_blood_jade_traced' }, { type: 'stat', stat: 'reputation', value: 2 }, { type: 'gain_item', itemId: 'small_healing_pill' }] },
   ] },
   { id: 'ch3_forest_blood_river_remnant_01', title: '第三章·截断血路', phase: 'day', locationId: 'forest', weight: 325, requirements: [{ type: 'flag', value: 'ch3_town_blood_jade_traced' }, { type: 'flag_missing', value: 'ch3_blood_river_remnant_defeated' }], text: '黑松林旧猎棚外，血河余党正以残页引人入魔。风过林梢，完整残卷的下落只差这一战。', choices: [
-    { id: 'duel', text: '正面截击血河余党', staminaCost: 2, effects: [{ type: 'set_flag', value: 'ch3_blood_river_remnant_defeated' }, { type: 'set_flag', value: 'blood_river_complete_scroll_found' }, { type: 'start_combat', enemyId: 'blood_river_puppet' }] },
+    { id: 'duel', text: '正面截击血河余党', staminaCost: 2, effects: [{ type: 'start_combat', enemyId: 'blood_river_puppet' }] },
     { id: 'ambush', text: '毁掉传信血玉夺回残卷', staminaCost: 2, effects: [{ type: 'set_flag', value: 'ch3_blood_river_remnant_defeated' }, { type: 'set_flag', value: 'blood_river_complete_scroll_found' }, { type: 'gain_card', cardId: 'frost_seal' }, { type: 'stat', stat: 'reputation', value: 1 }] },
   ] },
   { id: 'ch3_teahouse_final_choice_01', title: '终局·茶楼定卷', phase: 'day', locationId: 'teahouse', weight: 1200, requirements: [{ type: 'flag', value: 'ch3_blood_river_remnant_defeated' }], text: '茶楼二层忽然安静下来。完整《血河经》摆在案上，正道、魔道与无数无名百姓的命运，都等你一句话。', choices: [
