@@ -6,6 +6,8 @@ import { applyChoice, pickEventForLocation } from '../engine/eventEngine'
 import { cookRecipe } from '../engine/cookingEngine'
 import { equipEquipmentCard } from '../engine/equipmentEngine'
 import { advancePhase } from '../engine/dayPhaseEngine'
+import { enemyById } from '../data/enemies'
+import { cardById } from '../data/cards'
 import type { GameState, LocationId } from '../types/game'
 import { makeState } from './helpers'
 
@@ -20,6 +22,9 @@ const chooseOnlyOption = (state: GameState, locationId: LocationId, eventId: str
 const finishVictory = (state: GameState): GameState => {
   expect(state.currentCombat?.enemyId).toBeDefined()
   const enemyId = state.currentCombat!.enemyId
+  const enemy = enemyById[enemyId]
+  const rewardCard = enemy.rewardCardPool[0]
+  const gainedNewCard = !state.deck.includes(rewardCard)
   const nextFlags = [...state.flags]
   const addFlag = (flag: string) => {
     if (!nextFlags.includes(flag)) nextFlags.push(flag)
@@ -28,6 +33,10 @@ const finishVictory = (state: GameState): GameState => {
     addFlag('ch1_black_market_boss_defeated')
     addFlag('blood_river_fragment_found')
   }
+  if (state.currentEventId === 'ch3_forest_blood_river_remnant_01') {
+    addFlag('ch3_blood_river_remnant_defeated')
+    addFlag('blood_river_complete_scroll_found')
+  }
   return advancePhase({
     ...state,
     screen: 'map',
@@ -35,7 +44,10 @@ const finishVictory = (state: GameState): GameState => {
     currentEventId: undefined,
     currentLocationId: undefined,
     flags: nextFlags,
-    log: [...state.log, `测试结算：${enemyId} 战斗胜利。`],
+    deck: gainedNewCard ? [...state.deck, rewardCard] : state.deck,
+    itemBag: { ...state.itemBag, small_healing_pill: (state.itemBag.small_healing_pill ?? 0) + 1 },
+    player: { ...state.player, silver: state.player.silver + enemy.rewardSilver },
+    log: [...state.log, `测试结算：${enemyId} 战斗胜利，获得 ${enemy.rewardSilver} 两与 ${cardById[rewardCard]?.name ?? rewardCard}。`],
   })
 }
 
@@ -82,8 +94,15 @@ describe('full critical-path playthrough regression', () => {
     state = chooseOnlyOption(state, 'town', 'ch3_town_blood_jade_trace_01', 'trace')
     expect(state.flags).toContain('ch3_town_blood_jade_traced')
 
-    state = chooseOnlyOption(state, 'forest', 'ch3_forest_blood_river_remnant_01', 'ambush')
+    state = chooseOnlyOption(state, 'forest', 'ch3_forest_blood_river_remnant_01', 'duel')
+    expect(state.currentCombat?.enemyId).toBe('blood_river_puppet')
+    expect(state.flags).not.toContain('ch3_blood_river_remnant_defeated')
+    expect(state.flags).not.toContain('blood_river_complete_scroll_found')
+    expect(getCurrentGoal(state)).toBe('第三章：前往黑松林截击血河余党，夺回完整残卷。')
+
+    state = finishVictory(state)
     expect(state.flags).toEqual(expect.arrayContaining(['ch3_blood_river_remnant_defeated', 'blood_river_complete_scroll_found']))
+    if (state.phase === 'night') state = advancePhase(state)
 
     expect(getCurrentGoal(state)).toBe('终局：去茶馆作出血河经最终抉择。')
     state = chooseOnlyOption(state, 'teahouse', 'ch3_teahouse_final_choice_01', 'seal')
