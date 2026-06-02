@@ -8,7 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "art:list": "python3 scripts/list-art-assets.py",
+    "art:import-doubao": "python3 scripts/import-doubao-art.py",
+    "art:validate": "python3 scripts/import-doubao-art.py --check"
   },
   "dependencies": {
     "react": "^19.2.6",
